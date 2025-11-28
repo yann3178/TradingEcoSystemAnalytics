@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOP_UA_758_JY_60 - Strategy Analysis</title>
+    
+    <style>
+        :root {
+            --primary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        h1 {
+            color: var(--dark);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+            padding-left: 15px;
+        }
+        
+        .header-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .info-box {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .info-box strong {
+            display: block;
+            color: var(--dark);
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            color: white;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .badge-yes {
+            background: var(--success);
+        }
+        
+        .badge-no {
+            background: #95a5a6;
+        }
+        
+        .score {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .score-high {
+            color: var(--success);
+        }
+        
+        .score-medium {
+            color: var(--warning);
+        }
+        
+        .score-low {
+            color: var(--danger);
+        }
+        
+        .section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .analysis-list {
+            margin: 10px 0 10px 20px;
+        }
+        
+        .analysis-list li {
+            margin: 8px 0;
+        }
+        
+        .code-block {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .patterns-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        
+        .pattern-tag {
+            background: var(--light);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        
+        .links-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            color: white;
+        }
+        
+        .links-section a {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .header-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Retour à la liste</a>
+        
+        <h1>📊 TOP_UA_758_JY_60</h1>
+        
+        <div class="header-grid">
+            <div class="info-box">
+                <strong>Type</strong>
+                <span class="badge" style="background-color: #3498db">BREAKOUT</span>
+            </div>
+            <div class="info-box">
+                <strong>Sous-type</strong>
+                <span>Session_Range</span>
+            </div>
+            <div class="info-box">
+                <strong>Score Qualité</strong>
+                <span class="score score-high">7/10</span>
+            </div>
+            <div class="info-box">
+                <strong>Score Complexité</strong>
+                <span class="score score-medium">4/10</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📝 Résumé</h2>
+            <p>A <strong>session-based breakout strategy</strong> that trades breakouts of the current session&#39;s high/low, but only when the previous day&#39;s close was positioned in the favorable 20% of its range. Uses <strong>currency-based stops and targets</strong> with day-of-week filtering.</p>
+        </div>
+        
+        <div class="section">
+            <h2>🎯 Conditions d'Entrée</h2>
+            <p><strong>LONG Entries:</strong>
+• Previous day&#39;s close &gt; (low + 20% of range) - upper 20% filter
+• Current time between 00:00 and 15:00
+• Day of week ≠ DaytoFilterLng (0 = Sunday)
+• Buy at current session high breakout
+
+<strong>SHORT Entries:</strong>
+• Previous day&#39;s close &lt; (high - 20% of range) - lower 20% filter
+• Current time between 00:00 and 15:00
+• Day of week ≠ DaytoFilterSht (5 = Friday)
+• Sell short at current session low breakdown</p>
+        </div>
+        
+        <div class="section">
+            <h2>🚪 Conditions de Sortie</h2>
+            <p><strong>Normal Exits:</strong>
+• None specified
+
+<strong>Stop/Target Exits:</strong>
+• Stop loss: 1800 in <strong>currency</strong>
+• Take profit: 2800 in <strong>currency</strong>
+
+<strong>Time Exits:</strong>
+• Entry window closes at 15:00</p>
+        </div>
+        
+        <div class="header-grid">
+            <div class="info-box">
+                <strong>Stop Loss</strong>
+                <ul class="analysis-list"><li>SetStopLoss(<strong>1800</strong>) = 1800 in <strong>currency</strong></li></ul>
+            </div>
+            <div class="info-box">
+                <strong>Take Profit</strong>
+                <ul class="analysis-list"><li>SetProfitTarget(<strong>2800</strong>) = 2800 in <strong>currency</strong></li></ul>
+            </div>
+            <div class="info-box">
+                <strong>Exit On Close</strong>
+                <span class="badge badge-no">NO</span>
+            </div>
+            <div class="info-box">
+                <strong>Time Exit</strong>
+                <span class="badge badge-no">NO</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔧 Patterns & Fonctions</h2>
+            <div class="patterns-list"><span class="pattern-tag">_OHLCMulti5</span></div>
+            <p><strong>Nombre de patterns:</strong> 1 main function + 2 range filters</p>
+        </div>
+        
+        <div class='section'><h2>🔍 Détails des Patterns</h2><p><strong>_OHLCMulti5:</strong> Session OHLC calculation function
+• Meaning: Calculates session-based OHLC values for current and past 5 sessions
+• Session times: 17:00 to 16:00 (Asian/European session for JY)
+• Trading use: Provides session highs/lows for breakout levels
+• Returns: Current session O,H,L,C plus 5 previous sessions
+
+<strong>Range Position Filter:</strong>
+• Long filter: closed1 &gt; (lowd1 + 0.20 * (highd1-lowd1))
+• Short filter: closed1 &lt; (highd1 - 0.20 * (highd1-lowd1))
+• Meaning: Previous day close must be in favorable 20% of range
+• Purpose: Only trade breakouts when prior sentiment aligns</p></div>
+        
+        <div class="section">
+            <h2>⭐ Analyse Qualité</h2>
+            <p><strong>STRENGTHS:</strong>
+• Clear session-based logic appropriate for JY (Japanese Yen)
+• Smart range position filter reduces false breakouts
+• Proper risk management with defined stops/targets
+• Day-of-week filtering prevents trading on typically volatile days
+• Good risk/reward ratio (1800 stop vs 2800 target = 1:1.56)
+
+<strong>WEAKNESSES:</strong>
+• No exit strategy other than stop/target
+• Fixed contract size without position sizing
+• No trend or momentum confirmation
+• Vulnerable to whipsaws in ranging markets
+• Session times may not align with current market structure
+
+<strong>RISK MANAGEMENT:</strong>
+• Adequate stop loss at 1800 currency units
+• Reasonable profit target creates positive expectancy
+• Time-based entry window limits exposure
+
+<strong>OVERALL:</strong>
+A <strong>solid intermediate-level breakout strategy</strong> with intelligent filtering. The range position filter is particularly clever, ensuring breakouts occur when previous sentiment supports the direction. However, lacks <strong>adaptive exits</strong> and <strong>trend confirmation</strong> that could improve performance in different market conditions.</p>
+        </div>
+        
+        
+        
+        <h2>💻 Code Source</h2>
+        <div class="code-block"><pre>{
+Platform: multicharts
+session: default timezone: exchange
+timeframe: 60M
+type: trend following
+IS: 01.01.2010 to 01.01.2019
+OS: 01.01.2019 to today
+}
+
+
+
+
+//INPUT STARTS HERE****************************************************************************************************
+
+Input: MyStartTime(0000), MyEndTime(1500), 
+ 	DaytoFilterLng(0),DaytoFilterSht(5),
+ 	Target_MyProfit(2800),STOP_MyStop(1800),mycontracts(1);
+
+
+
+//VARIABLES STARTS HERE**********************************************************************************************
+
+var: 		sessionStartTimeC(1700),sessionEndTimeC(1600), // has to be set correctly to trading session times ! 
+    		 filter_1L(true),Filter_1S(true),filter_2L(true),Filter_2S(true),ret(true);
+
+array: ohlcValues[23](0){,adxCalcValues[3](0.001)};
+ret = _OHLCMulti5((sessionStartTimeC), (sessionEndTimeC), ohlcValues);
+
+
+var: opend0(0),opend1(0),opend2(0),opend3(0),opend4(0), opend5(0);
+var: highd0(0),highd1(0),highd2(0),highd3(		0),highd4(0), highd5(0);
+var: lowd0(0),lowd1(0),lowd2(0),lowd3(0),lowd4(0), lowd5(0);
+var: closed0(0),closed1(0),closed2(0),closed3(0),closed4(0), closed5(0);	
+
+opend0 = ohlcValues[0]; highd0 = ohlcValues[1]; lowd0 = ohlcValues[2]; closed0 = ohlcValues[3]; 
+opend1 = ohlcValues[4]; highd1 = ohlcValues[5]; lowd1 = ohlcValues[6]; closed1 = ohlcValues[7];
+opend2 = ohlcValues[8]; highd2 = ohlcValues[9]; lowd2 = ohlcValues[10]; closed2 = ohlcValues[11]; 
+opend3 = ohlcValues[12]; highd3 = ohlcValues[13]; lowd3 = ohlcValues[14]; closed3 = ohlcValues[15];
+opend4 = ohlcValues[16]; highd4 = ohlcValues[17]; lowd4 = ohlcValues[18]; closed4 = ohlcValues[19]; 
+opend5 = ohlcValues[20]; highd5 = ohlcValues[21]; lowd5 = ohlcValues[22]; closed5 = ohlcValues[23];
+
+
+
+
+//FILTERS STARTS HERE***************************************************************************************************
+
+
+
+	filter_1L = closed1 &gt; (lowd1+ ((highd1-lowd1)*0.20)); // Close of yesterday in the upper 20% of the range
+	filter_1S = closed1 &lt; (highd1- ((highd1-lowd1)*0.20)); // Close of yesterday in the bottom 20% of the range
+
+//ENTRY STARTS HERE***************************************************************************************************
+
+
+If Time &gt; MyStartTime And time &lt; MyEndTime then begin
+	
+	If filter_1L  and dayofweek(date) &lt;&gt; DaytoFilterLng 
+	then buy (&quot;LE&quot;) mycontracts contracts next bar at highd0{HighS(0)} stop;
+			
+	If filter_1S  and dayofweek(date) &lt;&gt; DaytoFilterSht 
+	
+	then sellshort (&quot;SE&quot;) mycontracts contracts next bar at lowd0{ LowS(0)} stop;
+end;
+
+
+
+//EXITs ****************************************************************************************************
+
+setstopcontract;
+	If Target_MyProfit &gt; 0 then setprofittarget(Target_MyProfit);
+	if STOP_MyStop &gt; 0 then setstoploss(STOP_MyStop);
+//TITAN FAST EXPORT (mette il report direttamente in C:\Titan\Reports
+input: TitanExportMode(0);
+if TitanExportMode=1 then WriteDailiesCTitanReports(1080101, TitanExportMode);
+</pre></div>
+        
+        <p style="margin-top: 20px; color: #7f8c8d; font-size: 0.9em;">
+            Généré le 2025-11-28 18:02 | 
+            Hash: c6ef745e0484...
+        </p>
+    </div>
+</body>
+</html>

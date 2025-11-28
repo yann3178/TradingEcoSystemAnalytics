@@ -311,6 +311,82 @@ class CorrelationAnalyzer:
             print(f"📁 Matrice CT exportée: {path}")
         
         return files
+    
+    def export_dashboard(self, output_path: Path) -> Path:
+        """
+        Génère un dashboard HTML interactif.
+        
+        Args:
+            output_path: Chemin du fichier HTML de sortie
+            
+        Returns:
+            Path du fichier généré
+        """
+        from ..generators.correlation_dashboard import CorrelationDashboardGenerator
+        
+        if self.corr_matrix_lt is None or self.corr_matrix_ct is None:
+            raise ValueError("Exécutez run() avant d'exporter le dashboard")
+        
+        # Préparer les paires extrêmes
+        most_lt, least_lt = find_extreme_pairs(self.corr_matrix_lt, top_n=20)
+        most_ct, least_ct = find_extreme_pairs(self.corr_matrix_ct, top_n=20)
+        
+        pairs_lt = {
+            'most_correlated': most_lt.to_dict('records') if len(most_lt) > 0 else [],
+            'least_correlated': least_lt.to_dict('records') if len(least_lt) > 0 else []
+        }
+        pairs_ct = {
+            'most_correlated': most_ct.to_dict('records') if len(most_ct) > 0 else [],
+            'least_correlated': least_ct.to_dict('records') if len(least_ct) > 0 else []
+        }
+        
+        # Calculer les plus grands changements
+        biggest_changes = []
+        if self.delta_matrix is not None and not self.delta_matrix.empty:
+            delta_pairs = []
+            strategies = self.delta_matrix.columns.tolist()
+            for i, s1 in enumerate(strategies):
+                for j in range(i + 1, len(strategies)):
+                    s2 = strategies[j]
+                    delta = self.delta_matrix.loc[s1, s2]
+                    if not np.isnan(delta):
+                        delta_pairs.append({
+                            'Strategy_1': s1,
+                            'Strategy_2': s2,
+                            'Delta': float(delta)
+                        })
+            if delta_pairs:
+                df_delta = pd.DataFrame(delta_pairs)
+                df_delta['Abs_Delta'] = df_delta['Delta'].abs()
+                biggest_changes = df_delta.nlargest(20, 'Abs_Delta')[['Strategy_1', 'Strategy_2', 'Delta']].to_dict('records')
+        
+        # Configuration pour le générateur
+        config = {
+            'start_year_longterm': self.start_year_longterm,
+            'recent_months': self.recent_months,
+            'correlation_threshold': self.correlation_threshold,
+            'weight_longterm': self.weight_longterm,
+            'weight_recent': self.weight_recent,
+            'min_common_days_longterm': self.min_common_days_longterm,
+            'min_common_days_recent': self.min_common_days_recent,
+        }
+        
+        # Générer le dashboard
+        generator = CorrelationDashboardGenerator(config)
+        output_path = generator.generate(
+            corr_lt=self.corr_matrix_lt,
+            corr_ct=self.corr_matrix_ct,
+            scores=self.scores,
+            stats_lt=self.stats_lt,
+            stats_ct=self.stats_ct,
+            pairs_lt=pairs_lt,
+            pairs_ct=pairs_ct,
+            biggest_changes=biggest_changes,
+            output_path=output_path
+        )
+        
+        print(f"📊 Dashboard HTML généré: {output_path}")
+        return output_path
 
 
 # ==============================================================================

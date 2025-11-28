@@ -46,6 +46,11 @@ OUTPUT_ROOT = V2_ROOT / "outputs"
 HTML_REPORTS_DIR = OUTPUT_ROOT / "html_reports"
 HTML_INDEX_FILE = HTML_REPORTS_DIR / "index.html"
 
+# AI Analysis HTML Reports (V2 migration)
+AI_ANALYSIS_DIR = OUTPUT_ROOT / "ai_analysis"
+AI_HTML_REPORTS_DIR = AI_ANALYSIS_DIR / "html_reports"
+AI_INDEX_FILE = AI_HTML_REPORTS_DIR / "index.html"
+
 # Exports CSV
 CSV_OUTPUT_DIR = OUTPUT_ROOT / "csv"
 STRATEGIES_ANALYSIS_CSV = CSV_OUTPUT_DIR / "strategies_analysis.csv"

@@ -1,0 +1,49 @@
+{
+  "timestamp": "20251128_1626",
+  "dry_run": false,
+  "steps": {
+    "correlation": {
+      "step": "correlation",
+      "success": true,
+      "nb_strategies": 244,
+      "errors": 0,
+      "duration_seconds": 27.6,
+      "summary": {
+        "nb_strategies": 244,
+        "avg_score_davey": 0.8,
+        "nb_diversifying": 205,
+        "nb_moderate": 34,
+        "nb_correlated": 5,
+        "nb_highly_correlated": 0,
+        "stats_lt": {
+          "label": "Long Terme",
+          "nb_strategies": 245,
+          "nb_pairs_valid": 29675,
+          "nb_pairs_total": 29890,
+          "corr_mean": 0.06183159418577187,
+          "corr_median": 0.019902592873676437,
+          "corr_std": 0.15191178261531849,
+          "corr_min": -0.6680957833459824,
+          "corr_max": 0.9825379525826649,
+          "pct_high_corr": 0.2527379949452401,
+          "pct_low_corr": 90.9519797809604
+        },
+        "stats_ct": {
+          "label": "Court Terme",
+          "nb_strategies": 244,
+          "nb_pairs_valid": 22559,
+          "nb_pairs_total": 29646,
+          "corr_mean": 0.05344337529089017,
+          "corr_median": 0.033178297358601595,
+          "corr_std": 0.1960379148099551,
+          "corr_min": -0.8334328087280829,
+          "corr_max": 0.9870458946123254,
+          "pct_high_corr": 0.5275056518462697,
+          "pct_low_corr": 87.26450640542576
+        }
+      },
+      "dashboard_path": "C:\\TradeData\\V2\\outputs\\correlation\\20251128_1626\\correlation_dashboard_20251128_1626.html"
+    }
+  },
+  "total_duration_seconds": 27.7
+}

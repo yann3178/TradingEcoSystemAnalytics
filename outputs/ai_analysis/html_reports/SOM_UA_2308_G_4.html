@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOM_UA_2308_G_4 - Strategy Analysis</title>
+    
+    <style>
+        :root {
+            --primary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        h1 {
+            color: var(--dark);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+            padding-left: 15px;
+        }
+        
+        .header-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .info-box {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .info-box strong {
+            display: block;
+            color: var(--dark);
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            color: white;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .badge-yes {
+            background: var(--success);
+        }
+        
+        .badge-no {
+            background: #95a5a6;
+        }
+        
+        .score {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .score-high {
+            color: var(--success);
+        }
+        
+        .score-medium {
+            color: var(--warning);
+        }
+        
+        .score-low {
+            color: var(--danger);
+        }
+        
+        .section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .analysis-list {
+            margin: 10px 0 10px 20px;
+        }
+        
+        .analysis-list li {
+            margin: 8px 0;
+        }
+        
+        .code-block {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .patterns-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        
+        .pattern-tag {
+            background: var(--light);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        
+        .links-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            color: white;
+        }
+        
+        .links-section a {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .header-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Retour à la liste</a>
+        
+        <h1>📊 SOM_UA_2308_G_4</h1>
+        
+        <div class="header-grid">
+            <div class="info-box">
+                <strong>Type</strong>
+                <span class="badge" style="background-color: #3498db">BREAKOUT</span>
+            </div>
+            <div class="info-box">
+                <strong>Sous-type</strong>
+                <span>Multi_Timeframe</span>
+            </div>
+            <div class="info-box">
+                <strong>Score Qualité</strong>
+                <span class="score score-medium">6/10</span>
+            </div>
+            <div class="info-box">
+                <strong>Score Complexité</strong>
+                <span class="score score-high">7/10</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📝 Résumé</h2>
+            <p>This strategy identifies <strong>critical levels</strong> from Data2 (higher timeframe) and trades breakouts of <strong>rounded levels</strong> on the primary timeframe. It uses <strong>pattern confirmation</strong> to filter entries and includes strict <strong>time-based position management</strong>.</p>
+        </div>
+        
+        <div class="section">
+            <h2>🎯 Conditions d'Entrée</h2>
+            <p><strong>LONG Entries:</strong>
+• PatternFast(13): body5d &lt; 1 * (highd5-lowd1) - 5-day body momentum filter
+• PatternFast(78) must be FALSE: closed1 &gt; (closed2+closed2*1*0.01) - avoids strong upward momentum
+• Close on Data2 crosses above lvlAbove (rounded level)
+• Within trading hours (18:00-15:15)
+• Less than maxTradesPerDay (1)
+
+<strong>SHORT Entries:</strong>
+• PatternFast(150): C &lt; opend0*0.995 - current close below 99.5% of today&#39;s open
+• PatternFast(34) must be FALSE: (highd0-opend0) &gt; (highd1-opend1)*1 - avoids strong intraday momentum
+• Close on Data2 crosses below lvlBelow (rounded level)
+• Within trading hours (18:00-15:15)
+• Less than maxTradesPerDay (1)</p>
+        </div>
+        
+        <div class="section">
+            <h2>🚪 Conditions de Sortie</h2>
+            <p><strong>Normal Exits:</strong>
+• Exit on close (setexitonclose)
+
+<strong>Stop/Target Exits:</strong>
+• Stop loss: 1100 in currency
+• No take profit (tp=0)
+• No breakeven (be=0)
+
+<strong>Time Exits:</strong>
+• Long positions: No time limit (maxBarsOpenLong=0)
+• Short positions: Maximum 28 bars</p>
+        </div>
+        
+        <div class="header-grid">
+            <div class="info-box">
+                <strong>Stop Loss</strong>
+                <ul class="analysis-list"><li>SetStopLoss(<strong>1100</strong>) = 1100 in <strong>currency</strong></li></ul>
+            </div>
+            <div class="info-box">
+                <strong>Take Profit</strong>
+                None
+            </div>
+            <div class="info-box">
+                <strong>Exit On Close</strong>
+                <span class="badge badge-yes">YES</span>
+            </div>
+            <div class="info-box">
+                <strong>Time Exit</strong>
+                <span class="badge badge-yes">YES</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔧 Patterns & Fonctions</h2>
+            <div class="patterns-list"><span class="pattern-tag">PatternFast(13)</span><span class="pattern-tag">PatternFast(78)</span><span class="pattern-tag">PatternFast(150)</span><span class="pattern-tag">PatternFast(34)</span></div>
+            <p><strong>Nombre de patterns:</strong> 4</p>
+        </div>
+        
+        <div class='section'><h2>🔍 Détails des Patterns</h2><p><strong>PatternFast(13):</strong> body5d &lt; 1 * (highd5-lowd1)
+• Meaning: 5-day body less than range from 5 days ago high to yesterday&#39;s low
+• Indicates: Controlled momentum, not overextended
+• Trading use: Long entry filter for reasonable momentum
+
+<strong>PatternFast(78):</strong> closed1 &gt; (closed2+closed2*1*0.01)
+• Meaning: Yesterday&#39;s close more than 1% above previous close
+• Indicates: Strong upward momentum
+• Trading use: AVOIDED for long entries (prevents chasing)
+
+<strong>PatternFast(150):</strong> C &lt; opend0*0.995
+• Meaning: Current close below 99.5% of today&#39;s open
+• Indicates: Intraday weakness
+• Trading use: Short entry confirmation
+
+<strong>PatternFast(34):</strong> (highd0-opend0) &gt; (highd1-opend1)*1
+• Meaning: Today&#39;s high-open range exceeds yesterday&#39;s
+• Indicates: Strong intraday momentum up
+• Trading use: AVOIDED for short entries</p></div>
+        
+        <div class="section">
+            <h2>⭐ Analyse Qualité</h2>
+            <p><strong>STRENGTHS:</strong>
+• Multi-timeframe approach using Data2 for levels
+• Smart rounded level breakouts (reduces noise)
+• Pattern filters prevent chasing momentum
+• Asymmetric time exits (28 bars short vs unlimited long)
+• Daily trade limit controls overtrading
+• Proper risk management with stop loss
+
+<strong>WEAKNESSES:</strong>
+• No take profit target (relies only on time/close exits)
+• Asymmetric position management may create bias
+• Pattern logic is complex and hard to validate
+• Single trade per day may miss opportunities
+• Large stop loss (1100 currency units) relative to no profit target
+
+<strong>RISK MANAGEMENT:</strong>
+• Fixed 1100 currency stop loss provides downside protection
+• Position sizing with MyContracts parameter
+• Daily trade limits prevent overexposure
+• Exit on close reduces overnight risk
+
+<strong>OVERALL:</strong>
+Moderately sophisticated <strong>multi-timeframe breakout system</strong> with good risk controls but <strong>unbalanced reward/risk profile</strong>. The lack of profit targets and large stops suggest this may struggle with win rate and risk-adjusted returns.</p>
+        </div>
+        
+        
+        
+        <h2>💻 Code Source</h2>
+        <div class="code-block"><pre>inputs: roundTo(50),MyContracts(1),
+	   timeSessStart(1700), timeSessEnd(1600), timeOpenStartHr(1800), timeOpenEndHr(1500), timeOpenStartMin(0), timeOpenEndMin(15),
+	   maxBarsOpenLong(0), maxBarsOpenShort(28), maxTradesPerDay(1), sl(1100), tp(0), be(0),
+	   patLongYes(13), patLongNo(78), patShortYes(150), patShortNo(34);
+
+arrays: ohlcValues[23](0), ohlcValuesD2[23](0);
+
+variables: isStartSess(true), lvlAbove(0), lvlBelow(0), counterTrade(0), mp(0), criticLevel(0), dummy(true);
+
+isStartSess = _OHLCMulti5(timeSessStart, timeSessEnd, ohlcValues);
+dummy= _OHLCMulti5_d2(timeSessStart, timeSessEnd, ohlcValuesD2);
+criticLevel = ohlcValuesD2[0];
+
+if isStartSess = true then
+	counterTrade = 0;
+mp = marketposition;
+if (mp &lt;&gt; 0) and (mp &lt;&gt; mp[1]) then
+	counterTrade = counterTrade + 1;
+
+// rounded levels
+lvlAbove = roundTo*ceiling(criticLevel/roundTo);
+lvlBelow = roundTo*floor(criticLevel/roundTo);
+
+// entry positions
+if tw(timeOpenStartHr + timeOpenStartMin, timeOpenEndHr + timeOpenEndMin) then
+begin
+	// long entry condition
+	if (PatternFast(patLongYes, ohlcValues)) and (PatternFast(patLongNo, ohlcValues) = false) and
+	   (counterTrade &lt; maxTradesPerDay) and (close data2 crosses above lvlAbove) then
+		buy MyContracts contracts next bar market;
+	// short entry condition
+	if (PatternFast(patShortYes, ohlcValues)) and (PatternFast(patShortNo, ohlcValues) = false) and
+	   (counterTrade &lt; maxTradesPerDay) and (close data2 crosses below lvlBelow) then
+		sellshort MyContracts contracts next bar market;
+end;
+
+// exit conditions
+if (barssinceentry &gt;= maxBarsOpenLong) and (maxBarsOpenLong &gt; 0) and (marketposition = 1) then
+	sell next bar at market;
+if (barssinceentry &gt;= maxBarsOpenShort) and (maxBarsOpenShort &gt; 0) and (marketposition = -1) then
+	buytocover next bar at market;
+
+setexitonclose;
+
+setstopcontract;
+if sl &gt; 0 then
+	setstoploss(sl);
+if tp &gt; 0 then
+	setprofittarget(tp);
+if be &gt; 0 then
+	setbreakeven(be);
+
+
+//TITAN FAST EXPORT
+input: TitanExportMode(0);
+var: bin(0);
+If TitanExportMode=1 then bin = writedailiesCTitanReports(1100101, TitanExportMode);
+</pre></div>
+        
+        <p style="margin-top: 20px; color: #7f8c8d; font-size: 0.9em;">
+            Généré le 2025-11-28 18:02 | 
+            Hash: aed6da71bc4d...
+        </p>
+    </div>
+</body>
+</html>

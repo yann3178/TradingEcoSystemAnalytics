@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOP_UA_742_FC_15 - Strategy Analysis</title>
+    
+    <style>
+        :root {
+            --primary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        h1 {
+            color: var(--dark);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+            padding-left: 15px;
+        }
+        
+        .header-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .info-box {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .info-box strong {
+            display: block;
+            color: var(--dark);
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            color: white;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .badge-yes {
+            background: var(--success);
+        }
+        
+        .badge-no {
+            background: #95a5a6;
+        }
+        
+        .score {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .score-high {
+            color: var(--success);
+        }
+        
+        .score-medium {
+            color: var(--warning);
+        }
+        
+        .score-low {
+            color: var(--danger);
+        }
+        
+        .section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .analysis-list {
+            margin: 10px 0 10px 20px;
+        }
+        
+        .analysis-list li {
+            margin: 8px 0;
+        }
+        
+        .code-block {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .patterns-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        
+        .pattern-tag {
+            background: var(--light);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        
+        .links-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            color: white;
+        }
+        
+        .links-section a {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .header-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Retour à la liste</a>
+        
+        <h1>📊 TOP_UA_742_FC_15</h1>
+        
+        <div class="header-grid">
+            <div class="info-box">
+                <strong>Type</strong>
+                <span class="badge" style="background-color: #3498db">BREAKOUT</span>
+            </div>
+            <div class="info-box">
+                <strong>Sous-type</strong>
+                <span>Channel</span>
+            </div>
+            <div class="info-box">
+                <strong>Score Qualité</strong>
+                <span class="score score-medium">6/10</span>
+            </div>
+            <div class="info-box">
+                <strong>Score Complexité</strong>
+                <span class="score score-high">7/10</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📝 Résumé</h2>
+            <p>A <strong>channel breakout strategy</strong> that enters positions when price breaks above/below a 160-bar channel, filtered by <strong>pattern conditions</strong> and <strong>EMA bias</strong>. Uses <strong>currency-based stops and targets</strong> with maximum days in trade restrictions.</p>
+        </div>
+        
+        <div class="section">
+            <h2>🎯 Conditions d'Entrée</h2>
+            <p><strong>LONG Entries:</strong>
+• Time window: 9:30-13:05 (excluding pause 12:00-11:00)
+• PatternNeutralFast(55) = true AND PatternNeutralFast(56) = false
+• PatternDirectionalFast(4) = true AND PatternDirectionalFast(-4) = false
+• Close &gt; EMA(2)
+• Buy next bar at 160-bar highest high (stop order)
+• Max 1 entry per day
+
+<strong>SHORT Entries:</strong>
+• Same time and neutral pattern conditions
+• PatternDirectionalFast(-4) = true AND PatternDirectionalFast(4) = false
+• Close &lt; EMA(2)
+• Sell short next bar at 160-bar lowest low (stop order)
+• Max 1 entry per day</p>
+        </div>
+        
+        <div class="section">
+            <h2>🚪 Conditions de Sortie</h2>
+            <p><strong>Normal Exits:</strong>
+• Exit on close if maximum days in trade reached (2 days)
+• Forced exit at 12:45 if max days condition met
+
+<strong>Stop/Target Exits:</strong>
+• Stop loss: $1,000 per contract
+• Take profit: $4,000 per contract
+• Breakeven: Disabled (set to 0)
+
+<strong>Time Exits:</strong>
+• Maximum 2 days in trade
+• Flat time at 12:45 when max days reached</p>
+        </div>
+        
+        <div class="header-grid">
+            <div class="info-box">
+                <strong>Stop Loss</strong>
+                <ul class="analysis-list"><li>SetStopLoss(<strong>1000</strong>) = $1,000 in <strong>currency</strong></li></ul>
+            </div>
+            <div class="info-box">
+                <strong>Take Profit</strong>
+                <ul class="analysis-list"><li>SetProfitTarget(<strong>4000</strong>) = $4,000 in <strong>currency</strong></li></ul>
+            </div>
+            <div class="info-box">
+                <strong>Exit On Close</strong>
+                <span class="badge badge-yes">YES</span>
+            </div>
+            <div class="info-box">
+                <strong>Time Exit</strong>
+                <span class="badge badge-yes">YES</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔧 Patterns & Fonctions</h2>
+            <div class="patterns-list"><span class="pattern-tag">PatternNeutralFast(55)</span><span class="pattern-tag">PatternNeutralFast(56)</span><span class="pattern-tag">PatternDirectionalFast(4)</span><span class="pattern-tag">PatternDirectionalFast(-4)</span><span class="pattern-tag">EMA(2)</span></div>
+            <p><strong>Nombre de patterns:</strong> 4 pattern conditions plus EMA filter</p>
+        </div>
+        
+        <div class='section'><h2>🔍 Détails des Patterns</h2><p><strong>PatternNeutralFast(55):</strong> Uses PatternFast(55) = (highd0&gt;(lowd0+lowd0*1*0.01))
+• Meaning: Current high &gt; low + 1% of low value
+• Indicates: Minimum daily range requirement
+• Trading use: Volatility filter
+
+<strong>PatternNeutralFast(56):</strong> Uses PatternFast(56) = (highd0&gt;(lowd0+lowd0*1.5*0.01))
+• Meaning: Current high &gt; low + 1.5% of low value
+• Indicates: Higher volatility threshold
+• Trading use: Excludes high volatility days (must be false)
+
+<strong>PatternDirectionalFast(4):</strong> Uses PatternFast(4) = body1d &lt; 0.75 * range1d
+• Meaning: Yesterday&#39;s body &lt; 75% of range
+• Indicates: Previous day had reasonable wicks/shadows
+• Trading use: Confirms breakout setup conditions
+
+<strong>EMA(2):</strong> 2-period Exponential Moving Average
+• Meaning: Very short-term trend filter
+• Indicates: Immediate price direction bias
+• Trading use: Long when above, short when below</p></div>
+        
+        <div class="section">
+            <h2>⭐ Analyse Qualité</h2>
+            <p><strong>STRENGTHS:</strong>
+• Clear channel breakout logic with defined parameters
+• Multiple pattern filters to reduce false breakouts
+• Proper risk management with stop loss and profit targets
+• Time-based position limits prevent extended drawdowns
+• Reasonable risk-reward ratio (1:4)
+
+<strong>WEAKNESSES:</strong>
+• Pattern conditions seem somewhat arbitrary and complex
+• Time pause logic appears incorrect (12:00-11:00 is impossible)
+• No trend confirmation beyond 2-period EMA
+• High profit target may limit win rate significantly
+• Channel lookback of 160 bars may be too long for intraday
+
+<strong>RISK MANAGEMENT:</strong>
+• Fixed $1,000 stop loss provides clear risk control
+• Maximum 2 days in trade limits exposure
+• Single contract and daily entry limits control position sizing
+• Profit target at $4,000 locks in gains
+
+<strong>OVERALL:</strong>
+A <strong>structured breakout system</strong> with decent risk controls but <strong>overly complex pattern filtering</strong>. The strategy concept is sound but execution details need refinement, particularly the <strong>time logic</strong> and <strong>pattern selection rationale</strong>.</p>
+        </div>
+        
+        
+        
+        <h2>💻 Code Source</h2>
+        <div class="code-block"><pre>//MultiCharts/TradeStation code generator by Unger Academy. All rights reserved.
+//Script generation datetime: 23-Dec-2023 17:30:13
+
+//Michael formula calculation begin
+Input:SessionStartTimeA(830), sessionEndTimeA(1305); //Set here your session time!
+array:ohlcvalues[23](0), adxCalcValues[3](0);
+var:IsStartOfSession(false);
+
+IsStartOfSession=_ohlcmulti5(SessionStartTimeA,sessionEndTimeA,ohlcvalues);
+//Michael formula calculation end
+
+Inputs: MyContracts(1), //Choose with how many contracts you want to work
+	MyStartTime(930), MyEndTime(1305), MyStartPause(1200), MyEndPause(1100), //Time window and pause
+	PtnNeutYes(55),PtnNeutNo(56),PtnDirYes(4),PtnDirNo(-4), //optimize Neutral from 1 to 55 (55=true, 56=false). Directional from -52 to 52 (52=true, 53=false)
+	MaxEntriesPerDay(1), //Set maximum entries per calendar day
+	EMA_len(2), //Exponential Moving Average length
+	nBars(160), //set here the number of bars for channel breakout strategy
+	MaxDaysInTrade(2), FlatTime(1245), //Set here the maximum number of days to stay in the market and the flat time!
+	MyStop(1000), //Set here your stoploss! (0=disabled)
+	MyBreakEven(0), //Set here your breakeven stop!(0=disabled)
+	MyProfit(4000); //Set here your profit target! (0=disabled)
+
+vars:EMA_val(0),upperchannel(0), lowerchannel(0),DaysInTrade(0), mp(0); 
+
+if isStartOfSession then begin
+	//Keep track of how many days the strategy has been in position
+	if marketposition&lt;&gt;0 then daysintrade=daysintrade+1;
+end;
+
+//VARIABLES&#39; CALCULATION
+EMA_val = XAverage(C,EMA_len);
+upperchannel = highest(h,nBars);
+lowerchannel = lowest(l,nBars);
+mp = marketposition;
+
+//ENTRIES
+if tw(MyStartTime,MyEndTime) and (Time&lt;MyStartPause or Time&gt;MyEndPause) and PatternNeutralFast(PtnNeutYes,ohlcvalues) and PatternNeutralFast(PtnNeutNo,ohlcvalues)=false and entriestoday(date)&lt;MaxEntriesPerDay then begin
+	if PatternDirectionalFast(PtnDirYes,ohlcvalues) and PatternDirectionalFast(PtnDirNo,ohlcvalues)=false and C&gt;EMA_val then buy(&quot;LE&quot;) MyContracts contracts next bar upperchannel stop;
+	if PatternDirectionalFast(-PtnDirYes,ohlcvalues) and PatternDirectionalFast(-PtnDirNo,ohlcvalues)=false and C&lt;EMA_val then sellshort(&quot;SE&quot;) MyContracts contracts next bar lowerchannel stop;
+end;
+
+if mp&lt;&gt;mp[1] and mp&lt;&gt;0 then daysintrade=1;
+
+//POSITION MANAGEMENT
+if daysintrade&gt;=maxDaysInTrade and maxDaysInTrade&gt;0 then begin
+	setexitonclose;
+	if Time=FlatTime then begin
+		if marketposition=1 then sell(&quot;LX_MaxDays&quot;) next bar market;
+		if marketposition=-1 then buytocover(&quot;SX_MaxDays&quot;) next bar market;
+	end;
+end;
+setstopcontract;
+if MyStop&gt;0 then setstoploss(MyStop);
+if MyBreakEven&gt;0 then setbreakeven(MyBreakEven);
+if MyProfit&gt;0 then setprofittarget(MyProfit);
+
+//TITAN FAST EXPORT (mette il report direttamente in C:\Titan\Reports)
+input: TitanExportMode(0);
+if TitanExportMode=1 then WriteDailiesCTitanReports(1100101, TitanExportMode);
+</pre></div>
+        
+        <p style="margin-top: 20px; color: #7f8c8d; font-size: 0.9em;">
+            Généré le 2025-11-28 18:02 | 
+            Hash: 345063d7b03b...
+        </p>
+    </div>
+</body>
+</html>

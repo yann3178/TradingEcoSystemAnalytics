@@ -1,281 +1,313 @@
-# Prompt de Continuation - Trading EcoSystem Analytics
+# 🎯 PROMPT DE CONTINUATION - Trading EcoSystem Analytics V2
 
-**Repository GitHub:** https://github.com/yann3178/TradingEcoSystemAnalytics
+## 📋 CONTEXTE DU PROJET
 
-## Contexte du Projet
+Je développe un système d'analyse automatisé pour mes ~800 stratégies de trading algorithmique MultiCharts. 
 
-Je travaille sur la réorganisation d'un système complet d'analyse de stratégies de trading MultiCharts. Le projet couvre :
+**Repository GitHub:** https://github.com/yann3178/TradingEcoSystemAnalytics  
+**Dossier local:** `C:\TradeData\V2`  
+**Documentation cible:** `C:\TradeData\V2\docs\DOCUMENTATION_COMPLETE.md`
 
-1. **Analyse IA** : Classification automatique des stratégies avec Claude
-2. **Enrichissement HTML** : Ajout KPIs + Equity curves aux rapports
-3. **Monte Carlo** : Simulation de risque et capital optimal (méthode Kevin Davey)
-4. **Corrélation** : Matrices de corrélation LT/CT avec scoring (méthode Kevin Davey)
-5. **Dashboard** : Interface web interactive avec filtres
-6. **Accès distant** : Tunnel Cloudflare pour mobile
+### Objectif Final
 
-Le travail initial était réparti entre deux projets Claude :
-- "Automatisation Strategy ID Card generation and DB"
-- "Trading Strategy Dashboard and Database"
-
-Nous avons créé une nouvelle structure V2 dans `C:\TradeData\V2\` sans toucher à l'ancienne structure.
+Pipeline unifié pour analyser ~800 stratégies avec :
+- **Analyse IA** : Classification automatique via Claude API (Anthropic)
+- **Enrichissement HTML** : KPIs + equity curves interactives
+- **Monte Carlo** : Simulation risque/capital (méthode Kevin Davey)
+- **Corrélation** : Matrices LT/CT avec scoring Davey
+- **Dashboards** : Interfaces web interactives mobile-friendly
+- **Accès distant** : Tunnel Cloudflare pour consultation mobile
 
 ---
 
-## Ce qui a été fait (V2)
+## ✅ ÉTAT ACTUEL (28/11/2025) - ~65% COMPLÉTÉ
 
-### Structure créée
+### Modules Implémentés et Fonctionnels
+
+```
+C:\TradeData\V2\src\
+├── utils/
+│   ├── matching.py                   # ✅ Fuzzy matching Levenshtein (23 tests PASS)
+│   ├── file_utils.py                 # ✅ Lecture robuste multi-encodage
+│   └── constants.py                  # ✅ Constantes partagées
+├── enrichers/
+│   ├── kpi_enricher.py               # ✅ Injection KPIs dans HTML (11 tests PASS)
+│   ├── equity_enricher.py            # ✅ Courbes equity Chart.js
+│   └── styles.py                     # ✅ CSS centralisé
+├── monte_carlo/
+│   ├── config.py                     # ✅ Paramètres Kevin Davey
+│   ├── data_loader.py                # ✅ Lecture formats Titan/CSV
+│   └── simulator.py                  # ✅ Moteur MC (8 tests PASS)
+├── consolidators/
+│   ├── config.py                     # ✅ Config corrélation Davey
+│   └── correlation_calculator.py     # ✅ Matrices LT/CT, scores, export dashboard
+├── generators/
+│   └── correlation_dashboard.py      # ✅ Dashboard HTML 6 onglets responsive
+└── analyzers/                        # ✅ NOUVEAU - Porté le 28/11/2025
+    ├── __init__.py                   # ✅ Module exports
+    ├── config.py                     # ✅ 8 catégories standardisées + prompts
+    ├── code_parser.py                # ✅ Parser PowerLanguage + hash + fonctions clés
+    ├── ai_analyzer.py                # ✅ Intégration Claude API + tracking delta
+    └── html_generator.py             # ✅ Rapports individuels + dashboard
+```
+
+### Scripts Principaux
+
 ```
 C:\TradeData\V2\
-├── config/settings.py           ✅ Configuration centralisée
-├── data/                        📦 Répertoires vides (à migrer)
-├── src/
-│   ├── utils/                   ✅ Utilitaires (file_utils, matching, constants)
-│   ├── enrichers/               ✅ Modules d'enrichissement (kpi, equity, styles)
-│   ├── analyzers/               🔲 À porter
-│   ├── consolidators/           🔲 À porter
-│   ├── monte_carlo/             🔲 À porter ← NOUVEAU
-│   └── generators/              🔲 À porter
-├── outputs/html_reports/        📦 Vide (à migrer)
-├── server/                      🔲 À développer
-├── docs/
-│   └── DOCUMENTATION_COMPLETE.md  ✅ Documentation exhaustive
-├── migrate_data.py              ✅ Script de migration
-├── run_enrich.py                ✅ Script d'enrichissement
-└── requirements.txt             ✅ Dépendances
+├── run_pipeline.py          # ✅ Pipeline unifié (3 étapes: enrich, MC, correlation)
+├── run_enrich.py            # ✅ Enrichissement standalone
+├── run_ai_analysis.py       # ✅ NOUVEAU - Analyse IA standalone
+├── config/settings.py       # ✅ Configuration centralisée
+├── migrate_data.py          # ✅ Migration données
+└── tests/
+    ├── test_ai_analyzer.py  # ✅ NOUVEAU - Tests module analyzers
+    └── ...autres tests
 ```
 
-### Modules développés en V2
-1. **`src/utils/`** : Lecture fichiers, fuzzy matching, constantes (patterns, symbols)
-2. **`src/enrichers/`** : Ajout KPIs + Equity curves aux HTML
-3. **`migrate_data.py`** : Copie les données sans toucher aux originaux
-4. **`run_enrich.py`** : Script principal d'enrichissement
+### Dernier Test Réussi (28/11/2025)
+
+```
+python run_pipeline.py --step correlation
+→ 244 stratégies analysées en 27.7 secondes
+→ 84% diversifiantes, 0 très corrélées
+→ Dashboard HTML 71 KB généré avec succès
+```
 
 ---
 
-## Composants existants à intégrer
+## ✅ PRIORITÉ 1 : Analyse IA - COMPLÉTÉ
 
-### Monte Carlo (FONCTIONNEL - à porter)
+**Module porté:** `src/analyzers/`
 
-**Localisation** : `C:\TradeData\scripts\monte_carlo_simulator\`
+**Fonctionnalités implémentées:**
+- ✅ Classification automatique en 8 catégories : BREAKOUT, MEAN_REVERSION, TREND_FOLLOWING, PATTERN, VOLATILITY, SEASONAL, MOMENTUM, OTHER
+- ✅ Génération de rapports HTML par stratégie
+- ✅ Gestion rate limits API Anthropic avec retry
+- ✅ Mode delta (incrémental) pour ne pas ré-analyser les stratégies inchangées
+- ✅ Système de tracking avec hash de code pour détecter les modifications
+- ✅ Support des fonctions clés (_OHLCMulti5, PatternFast)
+- ✅ Dashboard index.html avec filtres et statistiques
 
-| Fichier | Description |
-|---------|-------------|
-| `monte_carlo.py` | Moteur MC (classe `MonteCarloSimulator`) |
-| `batch_monte_carlo.py` | Traitement batch toutes stratégies |
-| `individual_visualizer.py` | Rapport HTML individuel |
-| `batch_visualizer.py` | Dashboard HTML global |
-| `data_loader.py` | Parsing fichiers trades |
-| `config.py` | Paramètres Kevin Davey |
+**Usage:**
+```powershell
+cd C:\TradeData\V2
 
-**Outputs générés** : `C:\TradeData\Results\MonteCarlo\`
-- ~250 rapports individuels (CSV + HTML)
-- Dashboard global `MC_Report_latest.html`
-- Liens bidirectionnels avec les fiches AI
+# Mode delta (incrémental)
+python run_ai_analysis.py
 
-**Paramètres Kevin Davey** :
+# Ré-analyser tout
+python run_ai_analysis.py --mode full
+
+# Limiter à 10 stratégies (test)
+python run_ai_analysis.py --max 10
+
+# Test sans appel API
+python run_ai_analysis.py --dry-run
+
+# Retraiter les erreurs
+python run_ai_analysis.py --retry-errors
+```
+
+**Fichiers générés:**
+- CSV: `outputs/ai_analysis/strategies_ai_analysis.csv`
+- HTML: `outputs/ai_analysis/html_reports/*.html`
+- Dashboard: `outputs/ai_analysis/html_reports/index.html`
+- Tracking: `outputs/ai_analysis/strategy_tracking.json`
+- Log: `outputs/ai_analysis/ai_analyzer.log`
+
+---
+
+## 🔴 CE QUI RESTE À FAIRE (par priorité)
+
+### PRIORITÉ 2 : Dashboard Principal Amélioré (`src/generators/dashboard_generator.py`)
+
+**Objectif:** Améliorer le dashboard principal avec plus de fonctionnalités
+
+**Source de référence:** `C:\TradeData\mc_ai_analysis\scripts\dashboard_v4_enhanced.py` (51 KB)
+
+**Améliorations à apporter:**
+- Ajouter les liens vers Monte Carlo
+- Ajouter les liens vers corrélation
+- Améliorer le responsive mobile
+- Ajouter plus de filtres (symbole, score min/max...)
+
+### PRIORITÉ 3 : Liens Inter-Dashboards
+
+**Objectif:** Relier tous les dashboards entre eux
+
+**Liens à implémenter:**
+- Dashboard corrélation → Rapports HTML détaillés par stratégie
+- Fiche AI → Fiche Monte Carlo
+- Fiche MC → Fiche AI
+- Dashboard principal → Toutes les fiches
+
+**Chemins des rapports:**
+- Rapports AI: `C:\TradeData\V2\outputs\ai_analysis\html_reports\{strategy}.html`
+- Rapports MC: `C:\TradeData\Results\MonteCarlo\Individual\{symbol}_{strategy}_MC.html`
+- Dashboard corrélation: `C:\TradeData\V2\outputs\correlation\{timestamp}\correlation_dashboard_*.html`
+
+### PRIORITÉ 4 : Monte Carlo Batch + Visualizer
+
+**Objectif:** Compléter le module Monte Carlo avec traitement batch et rapports HTML
+
+**Sources à porter:**
+- `C:\TradeData\scripts\monte_carlo_simulator\batch_monte_carlo.py` (~500 lignes)
+- `C:\TradeData\scripts\monte_carlo_simulator\individual_visualizer.py` (~300 lignes)
+- `C:\TradeData\scripts\monte_carlo_simulator\batch_visualizer.py` (~400 lignes)
+
+**Modules à créer:**
+```
+src/monte_carlo/
+├── simulator.py          # ✅ EXISTE
+├── config.py             # ✅ EXISTE
+├── data_loader.py        # ✅ EXISTE
+├── batch_processor.py    # 🔴 À CRÉER
+└── visualizer.py         # 🔴 À CRÉER
+```
+
+### PRIORITÉ 5 : Serveur + Cloudflare Tunnel
+
+**Objectif:** Accès distant sécurisé aux dashboards
+
+**Modules à créer:**
+```
+server/
+├── serve.py              # Serveur HTTP Python
+└── cloudflare_tunnel.py  # Gestion tunnel Zero Trust
+```
+
+**Source existante:** `C:\TradeData\mc_ai_analysis\serve_reports.ps1`
+
+---
+
+## 📋 CONVENTIONS TECHNIQUES
+
+### Format CSV Français
+- Séparateur: `;`
+- Décimal: `,`
+- Encodage: `utf-8-sig`
+
+### Catégories de Stratégies (8 catégories standardisées)
 ```python
-'capital_minimum': 5000
-'capital_increment': 2500
-'nb_capital_levels': 11
-'nb_simulations': 2500
-'ruin_threshold_pct': 0.40
-'max_acceptable_ruin': 0.10
-'min_return_dd_ratio': 2.0
-'min_prob_positive': 0.80
+STRATEGY_CATEGORIES = [
+    "BREAKOUT",        # Cassures de niveaux, range breakouts
+    "MEAN_REVERSION",  # Retour à la moyenne, RSI, Bollinger
+    "TREND_FOLLOWING", # Suivi de tendance, momentum directionnel
+    "PATTERN",         # Patterns chartistes, candlesticks
+    "VOLATILITY",      # Basé sur la volatilité, ATR
+    "SEASONAL",        # Saisonnalité, timing intraday, bias
+    "MOMENTUM",        # Momentum pur, force relative
+    "OTHER",           # Autres, hybrides, inclassables
+]
 ```
 
-### Corrélation (FONCTIONNEL - à porter)
+### Seuils Kevin Davey - Monte Carlo
+```python
+DEFAULT_MC_CONFIG = {
+    'capital_minimum': 5000,
+    'capital_increment': 2500,
+    'nb_capital_levels': 11,
+    'nb_simulations': 2500,
+    'ruin_threshold_pct': 0.40,      # Ruine si equity <= 40%
+    'max_acceptable_ruin': 0.10,     # Max 10% risque ruine
+    'min_return_dd_ratio': 2.0,      # Return/DD minimum
+    'min_prob_positive': 0.80,       # 80% prob finir positif
+}
+```
 
-**Localisation** : `C:\TradeData\scripts\correlation_analysis_v2.py` (~63 KB)
-
-**Méthode Kevin Davey** :
-- Deux matrices : Long Terme (2012→) + Court Terme (12 mois)
-- Méthode R² (Pearson²) avec seuils 0.70/0.85
-- Scoring par stratégie (somme des corrélations > seuil)
-- Pondération LT/CT 50/50
-
-### Autres scripts à porter
-
-| Script | Localisation | Taille |
-|--------|--------------|--------|
-| `ai_strategy_analyzer_v2.py` | `mc_ai_analysis/scripts/` | 73 KB |
-| `dashboard_v4_enhanced.py` | `mc_ai_analysis/scripts/` | 51 KB |
-| `consolidate_strategies_v7.py` | `scripts/` | 21 KB |
-| `serve_reports.ps1` | `mc_ai_analysis/` | 3.5 KB |
-
----
-
-## Intégration actuelle AI ↔ Monte Carlo
-
-Des scripts ont été créés pour l'intégration :
-- `sync_mc_to_site.py` : Copie MC vers `html_reports/MonteCarlo/`
-- `add_mc_link.py` : Ajoute liens MC dans les fiches AI
-- Liens bidirectionnels entre fiches AI et fiches MC
+### Seuils Kevin Davey - Corrélation
+```python
+DEFAULT_CORR_CONFIG = {
+    'start_year_longterm': 2012,
+    'recent_months': 12,
+    'correlation_threshold': 0.70,
+    'weight_longterm': 0.5,
+    'weight_recent': 0.5,
+}
+```
 
 ---
 
-## Prochaines étapes à réaliser
+## 🗂️ FICHIERS DE RÉFÉRENCE (V1/Legacy)
 
-### Étape 1 : Migration des données
-```bash
+### Scripts Restants à Porter
+
+| Fichier | Taille | Priorité | Module V2 Cible |
+|---------|--------|----------|-----------------|
+| `dashboard_v4_enhanced.py` | 51 KB | 🔴 P2 | `src/generators/` |
+| `batch_monte_carlo.py` | ~20 KB | 🟡 P4 | `src/monte_carlo/` |
+| `individual_visualizer.py` | ~15 KB | 🟡 P4 | `src/monte_carlo/` |
+| `batch_visualizer.py` | ~15 KB | 🟡 P4 | `src/monte_carlo/` |
+
+### Chemins Importants
+
+```
+C:\TradeData\
+├── V2\                              # Projet V2 actuel
+│   ├── src\analyzers\               # ✅ Module AI porté
+│   └── outputs\ai_analysis\         # Sorties analyse IA
+├── mc_ai_analysis\scripts\          # Scripts AI originaux
+├── scripts\monte_carlo_simulator\   # Scripts MC originaux
+├── scripts\correlation_analysis_v2.py  # Script corrélation original
+├── MC_Export_Code\clean\Strategies\ # 830 fichiers de stratégies
+└── Results\
+    ├── HTML_Reports\                # ~400 rapports HTML AI (legacy)
+    ├── MonteCarlo\Individual\       # ~250 rapports MC
+    ├── Portfolio_Report_V2_*.csv    # KPIs stratégies
+    └── Consolidated_Strategies_*.txt # 1.5M lignes données
+```
+
+---
+
+## 🚀 COMMANDES UTILES
+
+```powershell
 cd C:\TradeData\V2
-python migrate_data.py --dry-run
-python migrate_data.py
+
+# Tests
+pytest tests/ -v                      # Tous les tests
+pytest tests/test_ai_analyzer.py -v   # Tests module AI
+python tests/test_ai_analyzer.py      # Exécution directe tests AI
+
+# Analyse IA
+python run_ai_analysis.py             # Mode delta
+python run_ai_analysis.py --mode full # Tout ré-analyser
+python run_ai_analysis.py --max 10    # Test avec 10 stratégies
+python run_ai_analysis.py --dry-run   # Test config sans API
+
+# Pipeline
+python run_pipeline.py                # Pipeline complet
+python run_pipeline.py --step correlation  # Corrélation seule
+python run_pipeline.py --dry-run      # Aperçu sans exécuter
+
+# Enrichissement
+python run_enrich.py                  # Enrichir HTML avec KPIs
 ```
-
-### Étape 2 : Tester enrichissement
-```bash
-python run_enrich.py
-```
-
-### Étape 3 : Porter Monte Carlo vers V2
-- Créer `src/monte_carlo/`
-- Adapter les chemins vers la config centralisée
-- Créer `run_monte_carlo.py`
-
-### Étape 4 : Porter Corrélation vers V2
-- Créer `src/consolidators/correlation_calculator.py`
-- Créer `run_correlation.py`
-
-### Étape 5 : Dashboard et Serveur
-- Porter `dashboard_v4_enhanced.py`
-- Créer serveur HTTP Python + Cloudflare
-
-### Étape 6 : Pipeline unifié
-- Créer `run_pipeline.py` orchestrateur
 
 ---
 
-## Fichiers clés à lire
+## 📊 MÉTRIQUES ACTUELLES
 
-**Documentation** :
-- `C:\TradeData\V2\docs\DOCUMENTATION_COMPLETE.md` - Doc exhaustive avec Monte Carlo et Corrélation
-
-**Configuration V2** :
-- `C:\TradeData\V2\config\settings.py`
-
-**Monte Carlo existant** :
-- `C:\TradeData\scripts\monte_carlo_simulator\monte_carlo.py`
-- `C:\TradeData\scripts\monte_carlo_simulator\batch_monte_carlo.py`
-- `C:\TradeData\scripts\monte_carlo_simulator\config.py`
-
-**Corrélation existante** :
-- `C:\TradeData\scripts\correlation_analysis_v2.py`
-
-**Pour les anciens scripts AI** :
-- `C:\TradeData\mc_ai_analysis\scripts\ai_strategy_analyzer_v2.py`
-- `C:\TradeData\mc_ai_analysis\scripts\dashboard_v4_enhanced.py`
+| Métrique | Valeur |
+|----------|--------|
+| Stratégies totales (code) | ~830 |
+| Stratégies analysables (corrélation) | 244 |
+| Lignes données consolidées | 1,514,882 |
+| Temps analyse corrélation | ~28 secondes |
+| Couverture tests | Bonne (50+ tests) |
 
 ---
 
-## Demande
+## 🎯 PROCHAINE TÂCHE
 
-Continue le développement du pipeline V2 en suivant cette priorité :
+**Continuer avec la PRIORITÉ 2 : Améliorer le Dashboard Principal**
 
-1. **Exécute la migration** (`python migrate_data.py`)
-2. **Teste l'enrichissement** (`python run_enrich.py`)
-3. **Porte le système Monte Carlo** vers `src/monte_carlo/`
-4. **Porte le système de Corrélation** vers `src/consolidators/`
-5. **Crée le pipeline unifié** `run_pipeline.py`
-
-**Important** : 
-- Les fichiers volumineux (>50 KB) nécessitent une lecture partielle
-- Garde la rétrocompatibilité avec l'ancienne structure en fallback
-- Les rapports MC existants dans `Results/MonteCarlo/` fonctionnent déjà
+1. Ajouter les liens vers les rapports Monte Carlo
+2. Ajouter les liens vers le dashboard de corrélation
+3. Améliorer le responsive pour mobile
+4. Ajouter des filtres supplémentaires
 
 ---
 
-## Informations techniques
-
-- **OS** : Windows
-- **Python** : 3.10+
-- **API** : Claude (Anthropic) pour l'analyse IA
-- **Serveur** : Cloudflare Tunnel pour accès mobile
-- **Données** : ~800 stratégies, 245 equity curves, ~400 rapports HTML, ~250 rapports MC
-- **Volume consolidé** : ~200 MB (fichier avec coûts)
-
----
-
-## Tests de Validation
-
-### Structure des Tests
-```
-tests/
-├── conftest.py                    # Fixtures partagées
-├── pytest.ini                     # Configuration pytest
-├── create_test_reference.py       # Script création données référence
-├── TEST_STRATEGY.md               # Documentation stratégie de tests
-├── data/
-│   ├── samples/                   # Échantillons d'entrée (10 stratégies)
-│   └── expected/                  # Résultats référence V1
-├── unit/                          # Tests unitaires
-│   └── test_matching.py           # Tests fuzzy matching
-└── validation/                    # Tests régression V1 vs V2
-    ├── test_kpi_regression.py
-    └── test_monte_carlo_regression.py
-```
-
-### Commandes de Test
-```bash
-# Créer les données de référence (une fois)
-python tests/create_test_reference.py
-
-# Tous les tests
-pytest
-
-# Tests unitaires uniquement
-pytest tests/unit/ -v
-
-# Tests de validation V1 vs V2
-pytest tests/validation/ -v
-
-# Avec couverture
-pytest --cov=src --cov-report=html
-```
-
-### Toléances pour Tests Stochastiques (Monte Carlo)
-- Capital recommandé : ± 1 niveau (2500$)
-- Probabilité ruine : ± 2%
-- Return/DD ratio : ± 10%
-- Seed fixe (42) pour reproductibilité
-
----
-
-## Git et Versioning
-
-### Structure Git
-```
-C:\TradeData\V2\
-├── .gitignore                     # Exclut données sensibles
-├── .github/workflows/tests.yml    # CI/CD GitHub Actions
-├── README.md                      # README pour GitHub
-├── CHANGELOG.md                   # Historique des versions
-└── config/credentials.template.json  # Template (sans secrets)
-```
-
-### Commandes Git
-```bash
-# Initialiser le repo (depuis C:\TradeData\V2)
-cd C:\TradeData\V2
-git init
-git add .
-git commit -m "Initial commit V2.0.0"
-
-# Connecter au repository GitHub
-git remote add origin https://github.com/yann3178/TradingEcoSystemAnalytics.git
-git branch -M main
-git push -u origin main
-```
-
-### Ce qui est versionné
-- Code source (`src/`)
-- Tests et données de test échantillons (`tests/`)
-- Documentation (`docs/`)
-- Configuration (sans credentials)
-- Scripts d'exécution
-
-### Ce qui N'EST PAS versionné
-- `config/credentials.json` (secrets)
-- `data/` (données volumineuses)
-- `outputs/` (résultats générés)
-- `logs/`
+**Note:** Les fichiers du projet sont accessibles via les outils `view` ou `Filesystem:read_text_file`. La documentation complète est dans `C:\TradeData\V2\docs\DOCUMENTATION_COMPLETE.md`.

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOP_UA_515_FDAX_15 - Strategy Analysis</title>
+    
+    <style>
+        :root {
+            --primary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        h1 {
+            color: var(--dark);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+            padding-left: 15px;
+        }
+        
+        .header-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .info-box {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .info-box strong {
+            display: block;
+            color: var(--dark);
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            color: white;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .badge-yes {
+            background: var(--success);
+        }
+        
+        .badge-no {
+            background: #95a5a6;
+        }
+        
+        .score {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .score-high {
+            color: var(--success);
+        }
+        
+        .score-medium {
+            color: var(--warning);
+        }
+        
+        .score-low {
+            color: var(--danger);
+        }
+        
+        .section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .analysis-list {
+            margin: 10px 0 10px 20px;
+        }
+        
+        .analysis-list li {
+            margin: 8px 0;
+        }
+        
+        .code-block {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .patterns-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        
+        .pattern-tag {
+            background: var(--light);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        
+        .links-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            color: white;
+        }
+        
+        .links-section a {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .header-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Retour à la liste</a>
+        
+        <h1>📊 TOP_UA_515_FDAX_15</h1>
+        
+        <div class="header-grid">
+            <div class="info-box">
+                <strong>Type</strong>
+                <span class="badge" style="background-color: #9b59b6">MEAN_REVERSION</span>
+            </div>
+            <div class="info-box">
+                <strong>Sous-type</strong>
+                <span>RSI_Extreme</span>
+            </div>
+            <div class="info-box">
+                <strong>Score Qualité</strong>
+                <span class="score score-high">7/10</span>
+            </div>
+            <div class="info-box">
+                <strong>Score Complexité</strong>
+                <span class="score score-high">8/10</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📝 Résumé</h2>
+            <p>This is a <strong>mean reverting strategy</strong> that exploits <strong>false breakouts</strong> of yesterday&#39;s high/low levels. It enters positions only after price breaks through the trigger level and then <strong>reverses back</strong>, closing above/below the trigger level on the next bar.</p>
+        </div>
+        
+        <div class="section">
+            <h2>🎯 Conditions d'Entrée</h2>
+            <p><strong>LONG Entries:</strong>
+• Previous bar close below MyLETrigger (yesterday&#39;s low - LevelShift*MyTick)
+• Current bar close above MyLETrigger (false breakout confirmation)
+• UAPtnBase(41) pattern true AND UAPtnBase(42) pattern false
+• PatternFast(26) pattern true AND PatternFast(74) pattern false
+• Within trading hours (0800-1445, pause 1100-1200)
+• Not skip session day (SkipSessL=5)
+• Less than MaxTradesPerDay(2)
+
+<strong>SHORT Entries:</strong>
+• Previous bar close above MySETrigger (yesterday&#39;s high + LevelShift*MyTick)
+• Current bar close below MySETrigger (false breakout confirmation)
+• UAPtnBase(41) pattern true AND UAPtnBase(42) pattern false
+• PatternFast(40) pattern true AND PatternFast(9) pattern false
+• Within trading hours and session restrictions</p>
+        </div>
+        
+        <div class="section">
+            <h2>🚪 Conditions de Sortie</h2>
+            <p><strong>Normal Exits:</strong>
+• Maximum days in trade: 6 days for both long/short
+• Flat time exit at 21:45 if max days reached
+• One-direction only per session (no re-entry same direction)
+
+<strong>Stop/Target Exits:</strong>
+• Long: Stop=3000, Target=0 (no target)
+• Short: Stop=4000, Target=5000
+
+<strong>Time Exits:</strong>
+• SetExitOnClose when max days reached
+• Forced exit after 21:45 if in max days condition</p>
+        </div>
+        
+        <div class="header-grid">
+            <div class="info-box">
+                <strong>Stop Loss</strong>
+                <ul class="analysis-list"><li>Long: SetStopLoss(<strong>3000</strong>) = 3000 in <strong>currency</strong>
+• Short: SetStopLoss(<strong>4000</strong>) = 4000 in <strong>currency</strong></li></ul>
+            </div>
+            <div class="info-box">
+                <strong>Take Profit</strong>
+                <ul class="analysis-list"><li>Long: No profit target (MyProfitL=0)
+• Short: SetProfitTarget(<strong>5000</strong>) = 5000 in <strong>currency</strong></li></ul>
+            </div>
+            <div class="info-box">
+                <strong>Exit On Close</strong>
+                <span class="badge badge-yes">YES</span>
+            </div>
+            <div class="info-box">
+                <strong>Time Exit</strong>
+                <span class="badge badge-yes">YES</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔧 Patterns & Fonctions</h2>
+            <div class="patterns-list"><span class="pattern-tag">UAPtnBase(41)</span><span class="pattern-tag">UAPtnBase(42)</span><span class="pattern-tag">PatternFast(26)</span><span class="pattern-tag">PatternFast(74)</span><span class="pattern-tag">PatternFast(40)</span><span class="pattern-tag">PatternFast(9)</span></div>
+            <p><strong>Nombre de patterns:</strong> 6</p>
+        </div>
+        
+        <div class='section'><h2>🔍 Détails des Patterns</h2><p><strong>UAPtnBase(41):</strong> ((opend0-lowd0)&gt; ((opend1-lowd1)*0.5))
+• Meaning: Current bar&#39;s lower shadow &gt; 0.5x previous bar&#39;s lower shadow
+• Indicates: Increased buying pressure at lows
+• Trading use: Reversal signal from support
+
+<strong>UAPtnBase(42):</strong> ((opend0-lowd0)&gt; ((opend1-lowd1)*1))
+• Meaning: Current bar&#39;s lower shadow &gt; previous bar&#39;s lower shadow
+• Indicates: Strong buying at lows
+• Trading use: Confirmation of support level
+
+<strong>PatternFast(26):</strong> body5d &lt; 0.75 * range5d
+• Meaning: 5-day body less than 75% of 5-day range
+• Indicates: Consolidation with long wicks
+• Trading use: Low volatility, breakout setup
+
+<strong>PatternFast(74):</strong> ((closed1&lt;(closed2-closed2*2*0.01)))
+• Meaning: Yesterday&#39;s close &lt; day before&#39;s close minus 2%
+• Indicates: Strong bearish move
+• Trading use: Avoid longs after strong down moves
+
+<strong>PatternFast(40):</strong> ((opend0-lowd0)&lt; ((opend1-lowd1)))
+• Meaning: Current lower shadow &lt; previous lower shadow
+• Indicates: Less buying pressure at lows
+• Trading use: Weakness confirmation for shorts
+
+<strong>PatternFast(9):</strong> body5d &lt; 0.1 * (highd5-lowd1)
+• Meaning: 5-day body &lt; 10% of 5-day to 1-day range
+• Indicates: Very tight consolidation
+• Trading use: Breakout anticipation</p></div>
+        
+        <div class="section">
+            <h2>⭐ Analyse Qualité</h2>
+            <p><strong>STRENGTHS:</strong>
+• <strong>False breakout concept</strong> is statistically sound - many breakouts fail
+• <strong>Asymmetric risk management</strong> - different stops/targets for long/short
+• <strong>Session-based logic</strong> with proper OHLC calculation using Michael Bruns functions
+• <strong>Multiple pattern filters</strong> to improve entry quality
+• <strong>Trade frequency limits</strong> (max 2 per day) prevent overtrading
+• <strong>Maximum days</strong> protection against extended drawdowns
+
+<strong>WEAKNESSES:</strong>
+• <strong>Complex pattern combinations</strong> may lead to overfitting (6 different patterns)
+• <strong>No profit target for longs</strong> while shorts have 5000 target - asymmetric
+• <strong>Large stop losses</strong> (3000-4000) relative to typical intraday moves
+• <strong>LevelShift optimization</strong> across wide range (-10 to +10) suggests curve fitting
+• <strong>Skip session logic</strong> adds unnecessary complexity
+
+<strong>RISK MANAGEMENT:</strong>
+• <strong>Reasonable position sizing</strong> with contract input
+• <strong>Proper stop losses</strong> but quite large for 15-min timeframe
+• <strong>Daily trade limits</strong> help control risk
+• <strong>Time-based exits</strong> prevent indefinite holding
+
+<strong>OVERALL:</strong>
+Solid <strong>mean reversion concept</strong> but <strong>overly complex</strong> with too many pattern filters. The <strong>false breakout logic</strong> is sound, but the numerous pattern conditions and asymmetric profit targets suggest <strong>potential overfitting</strong>. Strategy would benefit from <strong>simplification</strong> and more balanced long/short treatment.</p>
+        </div>
+        
+        
+        
+        <h2>💻 Code Source</h2>
+        <div class="code-block"><pre>
+// Questo codice e&#39; di tipo mean reverting e sfrutta i falsi breakout del max/min di ieri. 
+// Entra a mercato solo dopo che i prezzo, dopo il breakout, torna indietro e chiude al di sotto/sopra del livello di trigger (max  o min di ieri).
+
+// NB: per usare efficacemente il Level Fader il timeframe deve essere 15 minuti. 
+
+
+
+// Reversal on last-session highest high / lowest low
+// Ticker: FDAX
+// Chart: 15 mins - exchange time
+// Coding date: Novembre - 10 - 2022
+
+input: mycontracts(1), //# of contracts
+	
+	sessionStartTimeA(0800), sessionEndTimeA(2200),
+	
+	LevelShift(7),MyTick(1), //  NB: in base allo strumento inserisco il valore del tick ed ottimizzo il levelShift da -10 a +10;
+	
+	MaxTradesPerDay(2),
+	
+	PtnLY(41), PtnLN(42), PtnSY(41), PtnSN(42),  
+	PtnLY_ext(26), PtnLN_ext(74), //NB: UNGER consiglia di essere molto prudenti con i pattern estesi per evitare l&#39;overfitting;
+	PtnSY_ext(40), PtnSN_ext(9), 
+
+	
+	MyStartTime(0800), MyEndTime(1445), MyStartPause(1200),MyEndPause(1100), 
+	
+	MaxDaysLong(6), MaxDaysShort(6),  flatTime(2145), //Maximum # of days to keep long and short position (1=intraday, 0=no limit)
+	
+	SkipSessL(5), SkipSessS(5), //Session of the week to skip
+      
+      MyStopL(3000), MyStopS (4000), MyBreakevenL(0), MyBreakevenS (0), MyProfitL(0), MyProfitS (5000);
+      
+      
+      
+vars:   OKL(true), OKS(true), DaysInTrade(0), SoW(0), mp(0), SessAcross2Days(false), FlatTimeFixed(0), MySessionEntries(0), 
+	   
+	  endsession(0),
+	  
+	  mypivot(0), myR1(0), myS1(0), myR2(0), myS2(0),
+	  MyLETrigger(0), MySETrigger(99999),
+
+
+	  // per gestire gli SL PT con MP=0 inserisco:
+	    MyFlatStop(0);
+	
+
+
+
+//end of session setting////////////////////////un valore di 2500 ad esempio creerebbe una sessione di 24 ore
+if sessionEndTimeA &gt;= 2400 then endsession = sessionStartTimeA
+else endsession = sessionEndTimeA;
+
+
+
+//&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;	Michael OHLC Calculation begin
+array: ohlcValues[23](0);
+var: isStartOfSession(false), highd1(0), lowd1(0); 
+isStartOfSession = _OHLCMulti5(sessionStartTimeA, endsession, ohlcValues);
+highd1 = ohlcValues[5]; lowd1 = ohlcValues[6]; 
+
+//&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;	Michael OHLC Calculation end
+
+
+//UNGER dice che la parte sottostante serve solo per scrupolo e per coprire tutti i possibili sottostanti, sia quelli a cavallo tra due sessioni che quelli che non lo sono:
+once begin
+	SessAcross2Days = sessionStartTimeA&gt;sessionEndTimeA; //Verifies if the session is across 2 calendar days (cosa che succede per la maggior parte dei sottostanti)
+	
+	//Determines the correct flat time according to the session type; 
+	if SessAcross2Days then FlatTimeFixed = sessionStartTimeA
+	else FlatTimeFixed = sessionEndTimeA;
+	if sessionStartTimeA=0 and sessionEndTimeA=0 then FlatTimeFixed = 2359;
+end;
+
+
+If isStartOfSession then begin
+	//Reset permission to work long and short at every session reset (N.B. if you go overnight OKL/OKS will become false at next bar!)
+	OKL = true;	OKS = true;
+	
+	if marketposition&lt;&gt;0 then daysintrade = daysintrade+1;
+	
+	// variabile usata al posto di EntriesToday per lavoraee con i sottostanti americani; viene azzerata ad inizio sessione:
+	MySessionEntries = 0;
+	
+	//Actual session count within the trading week
+	//sow = session of week - e&#39; una finezza da codice avanzato che permette di gestire il giorno di skip session nel caso di sottostante a cavallo di due sessioni; 
+	//infatti la variabile SoW la troviamo piu&#39; in basso nel momento nelle condizioni di entrata;
+
+	if SessAcross2Days then sow = dayofweek(d)+1
+	else sow = dayofweek(d);
+	
+	MySETrigger = highd1+LevelShift*MyTick;
+	MyLETrigger = lowd1-LevelShift*MyTick;	
+	
+end;
+
+
+// ponendo qui queste due condizioni evito di rientrare long o short se sono gia&#39; long o short dalla sessione precedente ed in questa sessione prendo uno SL o un TP:
+if marketposition=1 then okl = false;
+if marketposition=-1 then oks = false;
+
+mp = marketposition;
+if mp&lt;&gt;mp[1] and mp&lt;&gt;0 then MySessionEntries = MySessionEntries + 1;
+
+
+
+                                                           
+                                                                 // CONDIZIONI OPERATIVE:
+
+
+if tw(MyStartTime,MyEndTime) and (t&lt;MyStartPause or t&gt;MyEndPause) and {EntriesToday(d)}MySessionEntries&lt;MaxTradesPerDay then begin
+
+	if okl and UAPtnBase(PtnLY,ohlcvalues) and UAPtnBase(PtnLN,ohlcvalues)=false and PatternFast(PtnLY_ext,ohlcvalues) and PatternFast(PtnLN_ext,ohlcvalues)=false  
+	and sow&lt;&gt;SkipSessL   and c[1]&lt;MyLETrigger and c&gt;MyLETrigger then Buy(&quot;LE&quot;) mycontracts contracts next bar at the market; 
+		
+	if oks and UAPtnBase(PtnSY,ohlcvalues) and UAPtnBase(PtnSN,ohlcvalues)=false and PatternFast(PtnSY_ext,ohlcvalues) and PatternFast(PtnSN_ext,ohlcvalues)=false 
+	and sow&lt;&gt;SkipSessS   and c[1]&gt;MySETrigger and c&lt;MySETrigger then Sellshort(&quot;SE&quot;) mycontracts contracts next bar at the market;
+end;
+
+    
+
+
+if mp&lt;&gt;mp[1] and mp&lt;&gt;0 then DaysInTrade = 1;  
+
+
+{ Con le condizioni poste OKL e OKS possiamo reversare ma non rientrare nella stessa direzione long o short se prendiamo uno SL o un TP. Infatti se ad inizio sessione sono gia&#39; ad 
+ esempio long e prendo uno SL o un TP non posso piu&#39; rientrare long nella stessa sessione; posso solamente entrare short se triggera la condizione per lo short.
+ Pertanto faccio solamente un trade o massimo 2 trade al giorno.
+    
+ Piu&#39; in basso inoltre imposto l&#39;uscita nei giorni del maxdayslong e maxdaysshort oppure in base al numero di barre: }
+
+if marketposition=1 then begin
+	//okl = false;
+	if MaxDaysLong&gt;0 and DaysInTrade&gt;=MaxDaysLong then begin
+		setexitonclose;
+		if t&gt;=flatTime and t&lt;FlatTimeFixed then sell(&quot;LX_MaxDays&quot;) next bar market;
+	end;
+end;
+
+if marketposition=-1 then begin
+	//oks = false;
+	if MaxDaysShort&gt;0 and DaysInTrade&gt;=MaxDaysShort then begin
+		setexitonclose;
+		if t&gt;=flatTime and t&lt;FlatTimeFixed then buytocover(&quot;SX_MaxDays&quot;) next bar market;
+	end;
+end;
+
+
+{aggiungo questi inputs per gestire l&#39;eventualita&#39; di uno SL o TP con entrata ed uscita all&#39;interno della stessa barra; pertanto qui vanno inseriti il massimo tra i due SL 
+long o short} 
+MyFlatStop = maxlist(MyStopL,MyStopS);
+//MyFlatProfit = maxlist(MyProfitL,MyProfitS);
+
+
+{N.B. devo inserire entrambi gli SL long e short negli inputs alla fine della fase di ottimizzazione altrimenti se da flat entro in posizione lo SL della barra in cui 
+sono entrato non ci sara&#39; e rischio di prendere SL piu&#39; ampi di quelli preventivati}
+setstopcontract;
+if mp=1 then begin
+	if MyStopL&gt;0 then setstoploss(MyStopL);
+	if MyBreakevenL&gt;0 then setbreakeven(MybreakEvenL);
+	if MyProfitL&gt;0 then setprofittarget(MyProfitL);
+end;
+if mp=-1 then begin
+	if MyStopS&gt;0  then setstoploss(MyStopS);
+	if MyBreakevenS&gt;0 then setbreakeven(MybreakEvenS);
+	if MyProfitS&gt;0 then setprofittarget(MyProfitS);
+end;
+//TITAN FAST EXPORT (mette il report direttamente in C:\Titan\Reports
+input: TitanExportMode(0);
+if TitanExportMode=1 then WriteDailiesCTitanReports(1080101, TitanExportMode);
+
+</pre></div>
+        
+        <p style="margin-top: 20px; color: #7f8c8d; font-size: 0.9em;">
+            Généré le 2025-11-28 18:02 | 
+            Hash: da72cc249826...
+        </p>
+    </div>
+</body>
+</html>
