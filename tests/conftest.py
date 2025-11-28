@@ -21,17 +21,18 @@ EXPECTED_DIR = Path(__file__).parent / "data" / "expected"
 # STRATÉGIES DE TEST
 # =============================================================================
 
+# Stratégies qui correspondent aux données dans portfolio_report.csv
 SAMPLE_STRATEGIES = [
-    "TOP_UA_287_GC_5",
+    "Yann_Casey_strategy_v0.1",  # Nom exact dans le CSV
     "SOM_UA_2303_Y_3",
     "EasterGold",
-    "Casey_strategy_v0.1",
-    "$PS_274_comp_UnmirrTF_jumper_nofilter_FDXM120",
+    "TOP_UA_287_GC_5",
     "SOM_UA_2302_G_1",
-    "TOP_UA_556_ES_15",
-    "SOM_UA_2305_G_1",
-    "TOP_UA_152_NQ_5",
     "SOM_UA_2311_G_1",
+    "TOP_UA_152_NQ_5",
+    "SOM_UA_2305_G_1",
+    "TOP_UA_228_FDAX_30",
+    "TOP_UA_556_ES_15",
 ]
 
 
@@ -82,6 +83,7 @@ def v1_reference_kpis():
     csv_path = EXPECTED_DIR / "v1_kpis" / "kpis_reference.csv"
     if not csv_path.exists():
         pytest.skip(f"Fichier de référence V1 manquant: {csv_path}")
+    # Format français: virgule comme séparateur décimal
     return pd.read_csv(csv_path, sep=";", decimal=",")
 
 
