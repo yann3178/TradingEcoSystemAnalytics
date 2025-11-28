@@ -1,0 +1,648 @@
+"""
+Pipeline Unifié - Trading Strategy Analysis V2
+==============================================
+Script principal qui orchestre l'ensemble du pipeline d'analyse:
+1. Enrichissement HTML avec KPIs du Portfolio Report
+2. Simulation Monte Carlo (méthode Kevin Davey)
+3. Analyse de corrélation Long Terme / Court Terme
+
+Usage:
+    python run_pipeline.py                    # Exécute tout le pipeline
+    python run_pipeline.py --step enrich      # Enrichissement KPI uniquement
+    python run_pipeline.py --step montecarlo  # Monte Carlo uniquement
+    python run_pipeline.py --step correlation # Corrélation uniquement
+    python run_pipeline.py --dry-run          # Affiche ce qui serait fait
+
+Version: 2.0.0
+Date: 2025-11-28
+"""
+
+import argparse
+import sys
+import time
+from pathlib import Path
+from datetime import datetime
+from typing import Optional, List, Dict, Any
+import json
+
+# Ajouter le répertoire racine au path
+V2_ROOT = Path(__file__).parent
+sys.path.insert(0, str(V2_ROOT))
+
+# Imports projet
+from config.settings import (
+    V2_ROOT, OUTPUT_ROOT, DATA_ROOT,
+    PORTFOLIO_REPORTS_DIR, HTML_REPORTS_DIR, EQUITY_CURVES_DIR,
+    CONSOLIDATED_DIR, CORRELATION_DIR, CSV_OUTPUT_DIR,
+    FUZZY_MATCH_THRESHOLD, LEGACY_ROOT,
+    ensure_directories, get_latest_portfolio_report, get_latest_consolidated
+)
+
+
+# =============================================================================
+# CONFIGURATION DU PIPELINE
+# =============================================================================
+
+class PipelineConfig:
+    """Configuration du pipeline."""
+    
+    def __init__(self):
+        # Étapes à exécuter
+        self.run_enrich = True
+        self.run_monte_carlo = True
+        self.run_correlation = True
+        
+        # Paramètres d'enrichissement
+        self.enrich_backup = True
+        self.enrich_force = False  # Ré-enrichir même si déjà fait
+        
+        # Paramètres Monte Carlo
+        self.mc_nb_simulations = 1000
+        self.mc_nb_capital_levels = 10
+        self.mc_capital_minimum = 10000
+        self.mc_capital_increment = 5000
+        self.mc_max_strategies = 0  # 0 = toutes
+        
+        # Paramètres Corrélation
+        self.corr_start_year = 2012
+        self.corr_recent_months = 12
+        self.corr_threshold = 0.70
+        
+        # Options
+        self.verbose = True
+        self.dry_run = False
+        self.generate_dashboard = True
+        
+        # Timestamp pour cette exécution
+        self.timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+
+
+# =============================================================================
+# ÉTAPE 1: ENRICHISSEMENT KPI
+# =============================================================================
+
+def step_enrich_kpis(config: PipelineConfig) -> Dict[str, Any]:
+    """
+    Étape 1: Enrichir les rapports HTML avec les KPIs du Portfolio Report.
+    
+    Returns:
+        Dict avec statistiques de l'étape
+    """
+    print("\n" + "=" * 70)
+    print("📊 ÉTAPE 1: ENRICHISSEMENT KPI")
+    print("=" * 70)
+    
+    result = {
+        'step': 'enrich_kpis',
+        'success': False,
+        'enriched': 0,
+        'skipped': 0,
+        'errors': 0,
+        'duration_seconds': 0
+    }
+    
+    start_time = time.time()
+    
+    try:
+        # Import du module
+        from src.enrichers.kpi_enricher import KPIEnricher
+        from src.enrichers.equity_enricher import enrich_html_with_equity_curve
+        from src.enrichers.styles import get_kpi_styles
+        
+        # Charger le Portfolio Report
+        try:
+            portfolio_path = get_latest_portfolio_report()
+            print(f"\n📁 Portfolio Report: {portfolio_path.name}")
+        except FileNotFoundError:
+            # Essayer dans le dossier Results legacy
+            legacy_reports = list(LEGACY_ROOT.glob("Results/Portfolio_Report_V2_*.csv"))
+            if legacy_reports:
+                portfolio_path = max(legacy_reports, key=lambda p: p.stat().st_mtime)
+                print(f"\n📁 Portfolio Report (legacy): {portfolio_path.name}")
+            else:
+                print("⚠️  Aucun Portfolio Report trouvé")
+                result['errors'] = 1
+                return result
+        
+        enricher = KPIEnricher(portfolio_path)
+        
+        if not enricher.portfolio_data:
+            print("⚠️  Aucune donnée dans le Portfolio Report")
+            result['errors'] = 1
+            return result
+        
+        # Trouver les rapports HTML à enrichir
+        html_dirs = [
+            HTML_REPORTS_DIR,
+            LEGACY_ROOT / "Results" / "HTML_Reports",
+        ]
+        
+        html_files = []
+        for html_dir in html_dirs:
+            if html_dir.exists():
+                html_files.extend(html_dir.glob("*.html"))
+        
+        # Filtrer les index et fichiers déjà enrichis
+        html_files = [f for f in html_files if f.name != "index.html"]
+        
+        print(f"\n📄 {len(html_files)} fichiers HTML trouvés")
+        print(f"📊 {len(enricher.portfolio_data)} stratégies dans le Portfolio Report")
+        
+        if config.dry_run:
+            print("\n🔍 Mode dry-run: aucune modification")
+            result['success'] = True
+            return result
+        
+        # Enrichir chaque fichier
+        for html_file in html_files:
+            try:
+                strategy_name = html_file.stem
+                kpis = enricher.find_kpis_for_strategy(strategy_name)
+                
+                if kpis is None:
+                    if config.verbose:
+                        print(f"   ⏭️  {strategy_name}: pas de KPIs trouvés")
+                    result['skipped'] += 1
+                    continue
+                
+                # Lire le HTML existant
+                content = html_file.read_text(encoding='utf-8')
+                
+                # Vérifier si déjà enrichi
+                if 'kpi-dashboard' in content and not config.enrich_force:
+                    if config.verbose:
+                        print(f"   ✓ {strategy_name}: déjà enrichi")
+                    result['skipped'] += 1
+                    continue
+                
+                # Générer le HTML des KPIs
+                kpi_html = enricher.generate_kpi_html(kpis)
+                kpi_styles = get_kpi_styles()
+                
+                # Injecter dans le HTML
+                if '</head>' in content:
+                    content = content.replace('</head>', f'{kpi_styles}\n</head>')
+                
+                if '<body>' in content:
+                    content = content.replace('<body>', f'<body>\n{kpi_html}')
+                elif '<body ' in content:
+                    # Body avec attributs
+                    import re
+                    content = re.sub(r'(<body[^>]*>)', rf'\1\n{kpi_html}', content)
+                
+                # Sauvegarder
+                if config.enrich_backup:
+                    backup_path = html_file.with_suffix('.html.bak')
+                    if not backup_path.exists():
+                        html_file.rename(backup_path)
+                        backup_path.rename(html_file)
+                        # Copie du backup
+                        import shutil
+                        shutil.copy2(html_file, backup_path)
+                
+                html_file.write_text(content, encoding='utf-8')
+                
+                if config.verbose:
+                    print(f"   ✅ {strategy_name}: enrichi")
+                result['enriched'] += 1
+                
+            except Exception as e:
+                print(f"   ❌ {html_file.name}: {e}")
+                result['errors'] += 1
+        
+        result['success'] = True
+        
+    except ImportError as e:
+        print(f"❌ Erreur d'import: {e}")
+        result['errors'] += 1
+    
+    result['duration_seconds'] = round(time.time() - start_time, 1)
+    
+    print(f"\n📈 Résumé: {result['enriched']} enrichis, {result['skipped']} ignorés, {result['errors']} erreurs")
+    print(f"⏱️  Durée: {result['duration_seconds']}s")
+    
+    return result
+
+
+# =============================================================================
+# ÉTAPE 2: SIMULATION MONTE CARLO
+# =============================================================================
+
+def step_monte_carlo(config: PipelineConfig) -> Dict[str, Any]:
+    """
+    Étape 2: Simulation Monte Carlo pour chaque stratégie.
+    
+    Returns:
+        Dict avec statistiques de l'étape
+    """
+    print("\n" + "=" * 70)
+    print("🎲 ÉTAPE 2: SIMULATION MONTE CARLO")
+    print("=" * 70)
+    
+    result = {
+        'step': 'monte_carlo',
+        'success': False,
+        'simulated': 0,
+        'skipped': 0,
+        'errors': 0,
+        'duration_seconds': 0,
+        'summaries': []
+    }
+    
+    start_time = time.time()
+    
+    try:
+        from src.monte_carlo.simulator import MonteCarloSimulator
+        from src.monte_carlo.data_loader import detect_file_format
+        
+        # Trouver les fichiers d'equity curves
+        equity_dirs = [
+            EQUITY_CURVES_DIR,
+            DATA_ROOT / "equity_curves",
+            LEGACY_ROOT / "Results" / "Titan_Equity_Export",
+        ]
+        
+        equity_files = []
+        for eq_dir in equity_dirs:
+            if eq_dir.exists():
+                equity_files.extend(eq_dir.glob("*.txt"))
+                equity_files.extend(eq_dir.glob("*.csv"))
+        
+        # Dédupliquer par nom
+        seen_names = set()
+        unique_files = []
+        for f in equity_files:
+            if f.stem not in seen_names:
+                seen_names.add(f.stem)
+                unique_files.append(f)
+        equity_files = unique_files
+        
+        print(f"\n📁 {len(equity_files)} fichiers d'equity curves trouvés")
+        
+        if config.mc_max_strategies > 0:
+            equity_files = equity_files[:config.mc_max_strategies]
+            print(f"   ⚠️  Limité à {config.mc_max_strategies} stratégies")
+        
+        if config.dry_run:
+            print("\n🔍 Mode dry-run: aucune simulation")
+            result['success'] = True
+            return result
+        
+        # Créer le répertoire de sortie
+        mc_output_dir = OUTPUT_ROOT / "monte_carlo" / config.timestamp
+        mc_output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Simuler chaque stratégie
+        for i, equity_file in enumerate(equity_files, 1):
+            try:
+                if config.verbose:
+                    print(f"\n[{i}/{len(equity_files)}] {equity_file.stem}...", end=" ", flush=True)
+                
+                # Vérifier le format
+                file_format = detect_file_format(str(equity_file))
+                if file_format == "unknown":
+                    if config.verbose:
+                        print("format inconnu, ignoré")
+                    result['skipped'] += 1
+                    continue
+                
+                # Créer le simulateur
+                mc = MonteCarloSimulator(
+                    strategy_file=str(equity_file),
+                    capital_minimum=config.mc_capital_minimum,
+                    capital_increment=config.mc_capital_increment,
+                    nb_capital_levels=config.mc_nb_capital_levels,
+                    nb_simulations=config.mc_nb_simulations,
+                )
+                
+                # Lancer la simulation
+                mc.run(verbose=False)
+                
+                # Sauvegarder les résultats
+                csv_path = mc_output_dir / f"{equity_file.stem}_mc.csv"
+                mc.export_csv(str(csv_path), include_metadata=True)
+                
+                # Collecter le résumé
+                summary = mc.get_summary()
+                result['summaries'].append(summary)
+                
+                if config.verbose:
+                    status_icon = "✅" if mc.status == "OK" else "⚠️" if mc.status == "WARNING" else "🔴"
+                    capital_str = f"${mc.recommended_capital:,.0f}" if mc.recommended_capital else "N/A"
+                    print(f"{status_icon} Capital recommandé: {capital_str}")
+                
+                result['simulated'] += 1
+                
+            except Exception as e:
+                if config.verbose:
+                    print(f"❌ Erreur: {e}")
+                result['errors'] += 1
+        
+        # Exporter le résumé global
+        if result['summaries']:
+            import pandas as pd
+            df_summary = pd.DataFrame(result['summaries'])
+            summary_path = mc_output_dir / "monte_carlo_summary.csv"
+            df_summary.to_csv(summary_path, sep=';', decimal=',', index=False, encoding='utf-8-sig')
+            print(f"\n📊 Résumé exporté: {summary_path}")
+        
+        result['success'] = True
+        
+    except ImportError as e:
+        print(f"❌ Erreur d'import: {e}")
+        result['errors'] += 1
+    
+    result['duration_seconds'] = round(time.time() - start_time, 1)
+    
+    print(f"\n📈 Résumé: {result['simulated']} simulés, {result['skipped']} ignorés, {result['errors']} erreurs")
+    print(f"⏱️  Durée: {result['duration_seconds']}s")
+    
+    return result
+
+
+# =============================================================================
+# ÉTAPE 3: ANALYSE DE CORRÉLATION
+# =============================================================================
+
+def step_correlation(config: PipelineConfig) -> Dict[str, Any]:
+    """
+    Étape 3: Analyse de corrélation Long Terme / Court Terme.
+    
+    Returns:
+        Dict avec statistiques de l'étape
+    """
+    print("\n" + "=" * 70)
+    print("📊 ÉTAPE 3: ANALYSE DE CORRÉLATION")
+    print("=" * 70)
+    
+    result = {
+        'step': 'correlation',
+        'success': False,
+        'nb_strategies': 0,
+        'errors': 0,
+        'duration_seconds': 0,
+        'summary': {}
+    }
+    
+    start_time = time.time()
+    
+    try:
+        import pandas as pd
+        from src.consolidators.correlation_calculator import CorrelationAnalyzer
+        
+        # Charger le fichier consolidé
+        try:
+            consolidated_path = get_latest_consolidated()
+            print(f"\n📁 Fichier consolidé: {consolidated_path.name}")
+        except FileNotFoundError:
+            # Essayer dans le dossier Results legacy
+            legacy_files = list(LEGACY_ROOT.glob("Results/Consolidated_Strategies_*.txt"))
+            # Filtrer les fichiers COSTS, Filtered, Part
+            legacy_files = [f for f in legacy_files 
+                          if "COSTS" not in f.name 
+                          and "Filtered" not in f.name 
+                          and "Part" not in f.name]
+            if legacy_files:
+                consolidated_path = max(legacy_files, key=lambda p: p.stat().st_mtime)
+                print(f"\n📁 Fichier consolidé (legacy): {consolidated_path.name}")
+            else:
+                print("⚠️  Aucun fichier consolidé trouvé")
+                result['errors'] = 1
+                return result
+        
+        # Charger les données
+        print("\n📥 Chargement des données...")
+        df = pd.read_csv(consolidated_path, sep=';', encoding='utf-8', decimal=',')
+        print(f"   {len(df):,} lignes chargées")
+        print(f"   Colonnes: {list(df.columns)}")
+        
+        if config.dry_run:
+            print("\n🔍 Mode dry-run: aucune analyse")
+            result['success'] = True
+            return result
+        
+        # Créer l'analyseur
+        analyzer = CorrelationAnalyzer(
+            data=df,
+            start_year_longterm=config.corr_start_year,
+            recent_months=config.corr_recent_months,
+            correlation_threshold=config.corr_threshold,
+        )
+        
+        # Lancer l'analyse
+        analyzer.run(verbose=config.verbose)
+        
+        # Afficher le résumé
+        if config.verbose:
+            analyzer.print_summary()
+        
+        # Exporter les résultats
+        corr_output_dir = CORRELATION_DIR / config.timestamp
+        corr_output_dir.mkdir(parents=True, exist_ok=True)
+        
+        exported_files = analyzer.export_csv(corr_output_dir, prefix="correlation")
+        
+        # Générer le dashboard HTML si demandé
+        if config.generate_dashboard:
+            try:
+                dashboard_path = corr_output_dir / f"correlation_dashboard_{config.timestamp}.html"
+                analyzer.export_dashboard(dashboard_path)
+                exported_files['dashboard'] = dashboard_path
+                result['dashboard_path'] = str(dashboard_path)
+            except Exception as e:
+                print(f"⚠️  Erreur lors de la génération du dashboard: {e}")
+        
+        # Collecter les statistiques
+        result['summary'] = analyzer.get_summary()
+        result['nb_strategies'] = len(analyzer.scores) if analyzer.scores is not None else 0
+        result['success'] = True
+        
+    except ImportError as e:
+        print(f"❌ Erreur d'import: {e}")
+        result['errors'] += 1
+    except Exception as e:
+        print(f"❌ Erreur: {e}")
+        import traceback
+        traceback.print_exc()
+        result['errors'] += 1
+    
+    result['duration_seconds'] = round(time.time() - start_time, 1)
+    
+    print(f"\n📈 Résumé: {result['nb_strategies']} stratégies analysées, {result['errors']} erreurs")
+    print(f"⏱️  Durée: {result['duration_seconds']}s")
+    
+    return result
+
+
+# =============================================================================
+# PIPELINE PRINCIPAL
+# =============================================================================
+
+def run_pipeline(config: PipelineConfig) -> Dict[str, Any]:
+    """
+    Exécute le pipeline complet.
+    
+    Args:
+        config: Configuration du pipeline
+        
+    Returns:
+        Dict avec les résultats de chaque étape
+    """
+    print("\n" + "=" * 70)
+    print("🚀 TRADING STRATEGY ANALYSIS PIPELINE V2")
+    print("=" * 70)
+    print(f"⏰ Démarrage: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"📁 V2_ROOT: {V2_ROOT}")
+    
+    if config.dry_run:
+        print("🔍 MODE DRY-RUN: Aucune modification ne sera effectuée")
+    
+    # Créer les répertoires
+    ensure_directories()
+    
+    start_time = time.time()
+    results = {
+        'timestamp': config.timestamp,
+        'dry_run': config.dry_run,
+        'steps': {}
+    }
+    
+    # Étape 1: Enrichissement KPI
+    if config.run_enrich:
+        results['steps']['enrich'] = step_enrich_kpis(config)
+    
+    # Étape 2: Monte Carlo
+    if config.run_monte_carlo:
+        results['steps']['monte_carlo'] = step_monte_carlo(config)
+    
+    # Étape 3: Corrélation
+    if config.run_correlation:
+        results['steps']['correlation'] = step_correlation(config)
+    
+    # Résumé final
+    total_duration = round(time.time() - start_time, 1)
+    results['total_duration_seconds'] = total_duration
+    
+    print("\n" + "=" * 70)
+    print("✅ PIPELINE TERMINÉ")
+    print("=" * 70)
+    print(f"⏱️  Durée totale: {total_duration}s")
+    
+    # Afficher résumé par étape
+    for step_name, step_result in results['steps'].items():
+        status = "✅" if step_result.get('success', False) else "❌"
+        duration = step_result.get('duration_seconds', 0)
+        print(f"   {status} {step_name}: {duration}s")
+    
+    # Sauvegarder le rapport d'exécution
+    if not config.dry_run:
+        report_path = OUTPUT_ROOT / "pipeline_reports" / f"pipeline_report_{config.timestamp}.json"
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Nettoyer les données non-sérialisables
+        clean_results = json.loads(json.dumps(results, default=str))
+        
+        with open(report_path, 'w', encoding='utf-8') as f:
+            json.dump(clean_results, f, indent=2, ensure_ascii=False)
+        
+        print(f"\n📄 Rapport sauvegardé: {report_path}")
+    
+    return results
+
+
+# =============================================================================
+# POINT D'ENTRÉE
+# =============================================================================
+
+def main():
+    """Point d'entrée principal."""
+    parser = argparse.ArgumentParser(
+        description="Pipeline d'analyse des stratégies de trading V2",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Exemples:
+  python run_pipeline.py                      # Exécuter tout le pipeline
+  python run_pipeline.py --step enrich        # Enrichissement KPI uniquement
+  python run_pipeline.py --step montecarlo    # Monte Carlo uniquement
+  python run_pipeline.py --step correlation   # Corrélation uniquement
+  python run_pipeline.py --dry-run            # Mode simulation
+  python run_pipeline.py --mc-max 10          # Limiter Monte Carlo à 10 stratégies
+        """
+    )
+    
+    parser.add_argument(
+        '--step', '-s',
+        choices=['enrich', 'montecarlo', 'correlation', 'all'],
+        default='all',
+        help="Étape à exécuter (défaut: all)"
+    )
+    
+    parser.add_argument(
+        '--dry-run', '-n',
+        action='store_true',
+        help="Mode simulation (n'effectue aucune modification)"
+    )
+    
+    parser.add_argument(
+        '--quiet', '-q',
+        action='store_true',
+        help="Mode silencieux (moins de logs)"
+    )
+    
+    parser.add_argument(
+        '--mc-max',
+        type=int,
+        default=0,
+        help="Nombre maximum de stratégies pour Monte Carlo (0 = toutes)"
+    )
+    
+    parser.add_argument(
+        '--mc-sims',
+        type=int,
+        default=1000,
+        help="Nombre de simulations Monte Carlo par niveau (défaut: 1000)"
+    )
+    
+    parser.add_argument(
+        '--force',
+        action='store_true',
+        help="Forcer le ré-enrichissement même si déjà fait"
+    )
+    
+    args = parser.parse_args()
+    
+    # Configurer le pipeline
+    config = PipelineConfig()
+    config.dry_run = args.dry_run
+    config.verbose = not args.quiet
+    config.enrich_force = args.force
+    config.mc_max_strategies = args.mc_max
+    config.mc_nb_simulations = args.mc_sims
+    
+    # Sélectionner les étapes
+    if args.step == 'enrich':
+        config.run_enrich = True
+        config.run_monte_carlo = False
+        config.run_correlation = False
+    elif args.step == 'montecarlo':
+        config.run_enrich = False
+        config.run_monte_carlo = True
+        config.run_correlation = False
+    elif args.step == 'correlation':
+        config.run_enrich = False
+        config.run_monte_carlo = False
+        config.run_correlation = True
+    
+    # Exécuter
+    results = run_pipeline(config)
+    
+    # Code de sortie
+    all_success = all(
+        step.get('success', False) 
+        for step in results.get('steps', {}).values()
+    )
+    sys.exit(0 if all_success else 1)
+
+
+if __name__ == "__main__":
+    main()
