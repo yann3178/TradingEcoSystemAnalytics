@@ -2,6 +2,7 @@
 Pipeline Unifié - Trading Strategy Analysis V2
 ==============================================
 Script principal qui orchestre l'ensemble du pipeline d'analyse:
+0. Preprocessing (Strategy Mapping + Name Harmonization)
 1. Enrichissement HTML avec KPIs du Portfolio Report
 2. Simulation Monte Carlo (méthode Kevin Davey)
 3. Analyse de corrélation Long Terme / Court Terme
@@ -12,14 +13,16 @@ Usage:
     python run_pipeline.py --step montecarlo  # Monte Carlo uniquement
     python run_pipeline.py --step correlation # Corrélation uniquement
     python run_pipeline.py --dry-run          # Affiche ce qui serait fait
+    python run_pipeline.py --skip-preprocessing  # Sauter mapping + harmonization
 
-Version: 2.0.0
+Version: 2.1.0
 Date: 2025-11-28
 """
 
 import argparse
 import sys
 import time
+import subprocess
 from pathlib import Path
 from datetime import datetime
 from typing import Optional, List, Dict, Any
@@ -47,6 +50,9 @@ class PipelineConfig:
     """Configuration du pipeline."""
     
     def __init__(self):
+        # Preprocessing
+        self.run_preprocessing = True  # Strategy Mapping + Name Harmonization
+        
         # Étapes à exécuter
         self.run_enrich = True
         self.run_monte_carlo = True
@@ -75,6 +81,81 @@ class PipelineConfig:
         
         # Timestamp pour cette exécution
         self.timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+
+
+# =============================================================================
+# ÉTAPE 0A: STRATEGY MAPPING
+# =============================================================================
+
+def step_0a_mapping(config: PipelineConfig) -> Dict[str, Any]:
+    """
+    Étape 0A: Générer le mapping stratégie → symbole depuis Portfolio Report.
+    
+    Returns:
+        Dict avec statistiques de l'étape
+    """
+    print("\n" + "=" * 70)
+    print("🗺️  ÉTAPE 0A: STRATEGY MAPPING")
+    print("=" * 70)
+    
+    result = {
+        'step': 'strategy_mapping',
+        'success': False,
+        'nb_strategies': 0,
+        'nb_mappings': 0,
+        'errors': 0,
+        'duration_seconds': 0
+    }
+    
+    start_time = time.time()
+    
+    try:
+        # Import du module
+        from src.utils.strategy_mapper import StrategyMapper
+        
+        if config.dry_run:
+            print("\n🔍 Mode dry-run: aucun fichier généré")
+            result['success'] = True
+            return result
+        
+        print("\n📊 Génération du mapping stratégie → symbole...")
+        
+        # Créer le mapper
+        mapper = StrategyMapper()
+        
+        # Afficher les statistiques
+        if config.verbose:
+            mapper.print_statistics()
+        
+        # Exporter le mapping
+        output_path = mapper.export_mapping()
+        
+        # Collecter les stats
+        result['nb_strategies'] = len(mapper.strategy_map)
+        result['nb_mappings'] = sum(len(data['symbols']) for data in mapper.strategy_map.values())
+        result['success'] = True
+        
+        print(f"\n✅ Mapping généré: {output_path}")
+        
+    except ImportError as e:
+        print(f"❌ Erreur d'import: {e}")
+        print("   Vérifiez que src/utils/strategy_mapper.py existe")
+        result['errors'] += 1
+    except FileNotFoundError as e:
+        print(f"❌ Portfolio Report introuvable: {e}")
+        result['errors'] += 1
+    except Exception as e:
+        print(f"❌ Erreur: {e}")
+        import traceback
+        traceback.print_exc()
+        result['errors'] += 1
+    
+    result['duration_seconds'] = round(time.time() - start_time, 1)
+    
+    print(f"\n📈 Résumé: {result['nb_strategies']} stratégies mappées")
+    print(f"⏱️  Durée: {result['duration_seconds']}s")
+    
+    return result
 
 
 # =============================================================================
@@ -219,6 +300,101 @@ def step_enrich_kpis(config: PipelineConfig) -> Dict[str, Any]:
     result['duration_seconds'] = round(time.time() - start_time, 1)
     
     print(f"\n📈 Résumé: {result['enriched']} enrichis, {result['skipped']} ignorés, {result['errors']} erreurs")
+    print(f"⏱️  Durée: {result['duration_seconds']}s")
+    
+    return result
+
+
+# =============================================================================
+# ÉTAPE 1B: NAME HARMONIZATION
+# =============================================================================
+
+def step_1b_harmonization(config: PipelineConfig) -> Dict[str, Any]:
+    """
+    Étape 1B: Harmoniser les noms de fichiers HTML (ajouter préfixe symbole).
+    
+    Returns:
+        Dict avec statistiques de l'étape
+    """
+    print("\n" + "=" * 70)
+    print("📝 ÉTAPE 1B: NAME HARMONIZATION")
+    print("=" * 70)
+    
+    result = {
+        'step': 'name_harmonization',
+        'success': False,
+        'renamed': 0,
+        'kept_original': 0,
+        'errors': 0,
+        'duration_seconds': 0
+    }
+    
+    start_time = time.time()
+    
+    try:
+        # Chemin du script de migration
+        migration_script = V2_ROOT / 'migrate_ai_html_names.py'
+        
+        if not migration_script.exists():
+            print(f"⚠️  Script de migration introuvable: {migration_script}")
+            print("   L'harmonisation sera ignorée")
+            result['errors'] += 1
+            return result
+        
+        if config.dry_run:
+            print("\n🔍 Mode dry-run: aucune harmonisation")
+            print("   Utilisez: python migrate_ai_html_names.py --dry-run")
+            result['success'] = True
+            return result
+        
+        print("\n📝 Harmonisation des noms de fichiers HTML...")
+        print("   Format cible: SYMBOL_StrategyName.html")
+        
+        # Exécuter le script de migration
+        cmd = [sys.executable, str(migration_script)]
+        
+        # Ajouter --no-backup si pas besoin de backup (déjà fait par KPI enricher)
+        # cmd.append('--no-backup')  # Décommentez si souhaité
+        
+        process_result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            errors='replace'
+        )
+        
+        if process_result.returncode != 0:
+            print(f"❌ Erreur lors de l'harmonisation:")
+            print(process_result.stderr)
+            result['errors'] += 1
+            return result
+        
+        # Afficher la sortie
+        if config.verbose and process_result.stdout:
+            print(process_result.stdout)
+        
+        # Lire le rapport de migration pour les stats
+        migration_report = CONSOLIDATED_DIR / 'migration_report.json'
+        if migration_report.exists():
+            with open(migration_report, 'r', encoding='utf-8') as f:
+                report = json.load(f)
+                result['renamed'] = report.get('renamed', 0)
+                result['kept_original'] = report.get('kept_original', 0)
+                result['errors'] = report.get('errors', 0)
+        
+        result['success'] = True
+        print(f"\n✅ Harmonisation terminée")
+        
+    except Exception as e:
+        print(f"❌ Erreur: {e}")
+        import traceback
+        traceback.print_exc()
+        result['errors'] += 1
+    
+    result['duration_seconds'] = round(time.time() - start_time, 1)
+    
+    print(f"\n📈 Résumé: {result['renamed']} fichiers renommés, {result['kept_original']} conservés")
     print(f"⏱️  Durée: {result['duration_seconds']}s")
     
     return result
@@ -507,9 +683,25 @@ def run_pipeline(config: PipelineConfig) -> Dict[str, Any]:
         'steps': {}
     }
     
+    # Étape 0A: Strategy Mapping (NOUVEAU)
+    if config.run_preprocessing:
+        results['steps']['0a_mapping'] = step_0a_mapping(config)
+        
+        # Vérifier le succès avant de continuer
+        if not results['steps']['0a_mapping'].get('success', False):
+            print("\n⚠️  Mapping a échoué, mais on continue...")
+    
     # Étape 1: Enrichissement KPI
     if config.run_enrich:
         results['steps']['enrich'] = step_enrich_kpis(config)
+    
+    # Étape 1B: Name Harmonization (NOUVEAU - APRÈS enrichissement)
+    if config.run_preprocessing:
+        results['steps']['1b_harmonization'] = step_1b_harmonization(config)
+        
+        # Vérifier le succès
+        if not results['steps']['1b_harmonization'].get('success', False):
+            print("\n⚠️  Harmonisation a échoué, mais on continue...")
     
     # Étape 2: Monte Carlo
     if config.run_monte_carlo:
@@ -567,6 +759,7 @@ Exemples:
   python run_pipeline.py --step correlation   # Corrélation uniquement
   python run_pipeline.py --dry-run            # Mode simulation
   python run_pipeline.py --mc-max 10          # Limiter Monte Carlo à 10 stratégies
+  python run_pipeline.py --skip-preprocessing # Sauter mapping + harmonization
         """
     )
     
@@ -609,6 +802,12 @@ Exemples:
         help="Forcer le ré-enrichissement même si déjà fait"
     )
     
+    parser.add_argument(
+        '--skip-preprocessing',
+        action='store_true',
+        help="Sauter les étapes de preprocessing (mapping + harmonisation)"
+    )
+    
     args = parser.parse_args()
     
     # Configurer le pipeline
@@ -618,6 +817,10 @@ Exemples:
     config.enrich_force = args.force
     config.mc_max_strategies = args.mc_max
     config.mc_nb_simulations = args.mc_sims
+    
+    # Configuration preprocessing
+    if args.skip_preprocessing:
+        config.run_preprocessing = False
     
     # Sélectionner les étapes
     if args.step == 'enrich':
