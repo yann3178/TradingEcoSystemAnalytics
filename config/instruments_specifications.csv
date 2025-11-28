@@ -1,0 +1,41 @@
+﻿Instrument_Name;Major_Symbol;Major_Point_Value;Major_Intraday_Margin;Major_Overnight_Margin;Major_Slippage;Mini_Symbol;Mini_Point_Value;Mini_Intraday_Margin;Mini_Overnight_Margin;Mini_Slippage;Micro_Symbol;Micro_Point_Value;Micro_Intraday_Margin;Micro_Overnight_Margin;Micro_Slippage;Market_Group;Currency;Extra Min Unit
+DAX Future;FDAX;25.0;35400.0;35400.0;28.0;FDXM;5.0;7100.0;10110.0;7.0;FDXS;1.0;1280.0;2020.0;2.0;Equity Index;EUR;-
+S&P 500;SP;250.0;62500.0;62500.0;75.0;ES;50.0;10289.0;27598.0;30.0;MES;5.0;1028.0;2756.0;2.0;Equity Index;USD;-
+RBOB Gasoline;RB;42000.0;22080.0;22080.0;25.0;none;0.0;0.0;0.0;0.0;MRB;4200.0;2330.0;2330.0;3.0;Energy;USD;-
+Heating Oil;HO;42000.0;35000.0;35000.0;25.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Energy;USD;-
+Crude Oil;CL;1000.0;16250.0;16250.0;25.0;QM;500.0;8125.0;8125.0;15.0;MCL;100.0;1625.0;1625.0;2.0;Energy;USD;-
+Natural Gas;NG;10000.0;6891.0;6891.0;25.0;none;0.0;0.0;0.0;0.0;MNG;1000.0;1000.0;1000.0;3.0;Energy;USD;-
+Gold;GC;100.0;27136.0;27136.0;25.0;YG;50.0;8000.0;8000.0;15.0;MGC;10.0;2800.0;2800.0;5.0;Metals;USD;-
+Bund;FGBL;1000.0;3400.0;3400.0;20.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Bond;EUR;-
+BTP;FBTP;1000.0;6000.0;6000.0;12.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Bond;EUR;-
+Platinum;PL;50.0;4400.0;4400.0;20.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Metals;USD;-
+Palladium;PA;100.0;33000.0;33000.0;75.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Metals;USD;-
+Copper;HG;25000.0;14000.0;14000.0;30.0;none;0.0;0.0;0.0;0.0;MHG;2500.0;1411.0;1411.0;3.0;Metals;USD;-
+Feeder Cattle;FC;500.0;8500.0;8500.0;30.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Meats;USD;-
+Live Cattle;LC;400.0;4550.0;4550.0;18.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Meats;USD;-
+Lean Hogs;LH;400.0;4325.0;4325.0;18.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Meats;USD;-
+Soybeans;S;50.0;4000.0;4000.0;20.0;YK;10.0;750.0;750.0;3.0;none;0.0;0.0;0.0;0.0;Softs;USD;1
+Corn;C;50.0;2000.0;2000.0;27.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Softs;USD;1
+Wheat;W;50.0;4500.0;4500.0;27.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Softs;USD;1
+10yr Treasury Note;TY;1000.0;2600.0;2600.0;18.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Bond;USD;1
+30yr Treasury Bond;US;1000.0;6000.0;6000.0;40.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Bond;USD;1
+EUR/USD;EURUSD;100000.0;5000.0;5000.0;12.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Currency;USD;-
+British Pound;BP;62500.0;3300.0;3300.0;20.0;none;0.0;0.0;0.0;0.0;MBP;6250.0;300.0;300.0;2.0;Currency;USD;-
+Euro/FX;EC;125000.0;3190.0;3190.0;8.0;E7;62500.0;1325.0;1325.0;8.0;M6E;12500.0;265.0;265.0;2.0;Currency;USD;-
+Coffee;KC;37500.0;10000.0;10000.0;30.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Softs;USD;-
+Cocoa;CC;10.0;5300.0;5300.0;30.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Softs;USD;-
+Dow Jones Futures;none;0.0;0.0;0.0;0.0;YM;5.0;11500.0;15000.0;15.0;MYM;0.5;1200.0;1600.0;2.0;Equity Index;USD;-
+Nasdaq Futures;none;0.0;0.0;0.0;0.0;NQ;20.0;32500.0;46400.0;25.0;MNQ;2.0;3250.0;4640.0;2.0;Equity Index;USD;-
+EuroStoxx;FESX;10.0;3000.0;3700.0;12.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Equity Index;EUR;1
+Euro OAT;FOAT;1000.0;3000.0;3000.0;23.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Bond;EUR;-
+Japanese Yen;JY;125000.0;3500.0;3500.0;15.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Currency;USD;-
+Orange Juice;OJ;150.0;19000.0;19000.0;30.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Softs;USD;1
+Silver;SI;5000.0;18700.0;18700.0;40.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Metals;USD;-
+Australian Dollar F;AD;100000.0;3000.0;3000.0;20.0;none;0.0;0.0;0.0;0.0;M6A;10000.0;350.0;350.0;2.0;Currency;USD;-
+ETH;ETH;5.0;21500.0;21500.0;25.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Crypto;USD;-
+BTC;BTC;5.0;21500.0;21500.0;28.0;none;0.0;0.0;0.0;0.0;mBT;0.1;2000.0;2000.0;5.0;Crypto;USD;-
+Tesla;TSLA;1.0;2500.0;2500.0;5.0;Ticker (Mini);0.0;0.0;0.0;0.0;Ticker (Micro);0.0;0.0;0.0;0.0;Stock;USD;-
+Canadian;CD;100000.0;1000.0;1000.0;15.0;Ticker (Mini);0.0;0.0;0.0;0.0;MCD;10000.0;100.0;100.0;2.0;Currency;USD;-
+Russell;RTY;50.0;7200.0;7200.0;25.0;Ticker (Mini);0.0;0.0;0.0;0.0;M2K;5.0;720.0;720.0;2.0;Equity Index;USD;1
+Microsoft;MSFT;1.0;2500.0;2500.0;5.0;Ticker (Mini);0.0;0.0;0.0;0.0;Ticker (Micro);0.0;0.0;0.0;0.0;Equity Index;USD;1
+Euro/yen;-;125000.0;3000.0;3000.0;20.0;none;0.0;0.0;0.0;0.0;none;0.0;0.0;0.0;0.0;Currency;USD;-

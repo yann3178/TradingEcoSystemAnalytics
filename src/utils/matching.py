@@ -62,9 +62,10 @@ def normalize_strategy_name(name: str) -> str:
     
     Transformations:
         - Minuscules
-        - Supprime préfixes courants (TOP_, SOM_, $PS_, etc.)
-        - Supprime suffixes de timeframe (_15, _60, _1440, etc.)
-        - Supprime symboles redondants (_ES_, _NQ_, _GC_, etc.)
+        - Supprime extensions (.html, .txt, .csv)
+        - Supprime préfixes de symbole (GC_, ES_, NQ_, etc.)
+        - Supprime préfixes courants (TOP_UA_, SOM_UA_, $PS_, etc.)
+        - Supprime suffixes _MC
         - Remplace caractères spéciaux par underscore
     
     Args:
@@ -78,22 +79,30 @@ def normalize_strategy_name(name: str) -> str:
     
     normalized = name.lower().strip()
     
-    # Retirer préfixes courants
+    # Retirer extensions
+    normalized = re.sub(r'\.(html|txt|csv)$', '', normalized)
+    
+    # Retirer préfixes de symbole au début (GC_, ES_, NQ_, etc.)
+    symbols = ['gc', 'es', 'nq', 'cl', 'fdax', 'fgbl', 'ym', 'rty', 'hg', 'ng', 
+               'rb', 'si', 'zb', 'zn', 'ec', 'jy', 'bp', 'ad', 'cd', 'sf', 'fdxm']
+    for sym in symbols:
+        normalized = re.sub(rf'^{sym}_', '', normalized)
+    
+    # Retirer suffixes _MC
+    normalized = re.sub(r'_mc$', '', normalized)
+    
+    # Retirer préfixes courants de stratégie
     prefixes = [
         r'^(top_ua_|som_ua_|ua_|\$ps_|\$cata_|my_?script_?|my_?study_?)',
         r'^(s_|sa_|sb_|sc_|sd_)',
+        r'^yann_',
     ]
     for pattern in prefixes:
         normalized = re.sub(pattern, '', normalized, flags=re.IGNORECASE)
     
-    # Retirer suffixes de timeframe (_15, _30, _60, _1440, etc.)
-    normalized = re.sub(r'_+\d+(_+\d+)*$', '', normalized)
-    
     # Retirer suffixes de symbole redondants à la fin
-    symbols = ['es', 'nq', 'gc', 'cl', 'fdax', 'fgbl', 'ym', 'rty', 'hg', 'ng', 
-               'rb', 'si', 'zb', 'zn', 'ec', 'jy', 'bp', 'ad', 'cd', 'sf']
     for sym in symbols:
-        normalized = re.sub(rf'_{sym}$', '', normalized, flags=re.IGNORECASE)
+        normalized = re.sub(rf'_{sym}$', '', normalized)
     
     # Remplacer caractères spéciaux par underscore
     normalized = re.sub(r'[^a-z0-9]', '_', normalized)
@@ -110,9 +119,9 @@ def extract_strategy_core_name(name: str) -> str:
     Extrait le "cœur" du nom de stratégie (sans préfixes/suffixes numériques).
     
     Exemples:
-        "TOP_UA_287_GC_5" -> "287"
+        "TOP_UA_287_GC_5" -> "287_gc_5"
         "SOM_UA_2305_Y_5" -> "2305_y_5"
-        "ATS_Strategy_v0.8" -> "ats_strategy_v0.8"
+        "EasterGold" -> "eastergold"
     
     Args:
         name: Nom de stratégie
@@ -121,12 +130,6 @@ def extract_strategy_core_name(name: str) -> str:
         Partie centrale du nom
     """
     normalized = normalize_strategy_name(name)
-    
-    # Pour les stratégies UA, extraire le code
-    match = re.search(r'(\d{2,4}_[a-z]_?\d*)', normalized)
-    if match:
-        return match.group(1)
-    
     return normalized
 
 
@@ -134,8 +137,8 @@ def find_best_match(
     target: str,
     candidates: List[str],
     threshold: float = 0.80,
-    min_chars: int = 5
-) -> Optional[Tuple[str, float]]:
+    min_chars: int = 3
+) -> Tuple[Optional[str], float]:
     """
     Trouve la meilleure correspondance pour un nom dans une liste.
     
@@ -146,45 +149,42 @@ def find_best_match(
         min_chars: Minimum de caractères pour éviter faux positifs
     
     Returns:
-        Tuple (meilleur_candidat, score) ou None si aucun match
+        Tuple (meilleur_candidat, score) - candidat est None si aucun match au-dessus du seuil
     """
-    if not target or len(target) < min_chars:
-        return None
+    if not target or not candidates:
+        return (None, 0.0)
     
     target_norm = normalize_strategy_name(target)
-    target_core = extract_strategy_core_name(target)
     
     best_match = None
     best_score = 0.0
     
     for candidate in candidates:
-        if not candidate or len(candidate) < min_chars:
+        if not candidate:
             continue
         
         candidate_norm = normalize_strategy_name(candidate)
-        candidate_core = extract_strategy_core_name(candidate)
         
-        # Score 1: Similarité des noms normalisés
-        score_norm = similarity_ratio(target_norm, candidate_norm)
+        # Score basé sur la similarité des noms normalisés
+        score = similarity_ratio(target_norm, candidate_norm)
         
-        # Score 2: Similarité des cœurs
-        score_core = similarity_ratio(target_core, candidate_core)
+        # Bonus si le target est contenu dans le candidat ou vice-versa
+        if target_norm in candidate_norm or candidate_norm in target_norm:
+            score = max(score, 0.85)
         
-        # Score final: moyenne pondérée (cœur plus important)
-        score = 0.4 * score_norm + 0.6 * score_core
+        # Bonus si correspondance exacte
+        if target_norm == candidate_norm:
+            score = 1.0
         
-        # Bonus si correspondance exacte du cœur
-        if target_core == candidate_core:
-            score = max(score, 0.95)
-        
-        if score > best_score and score >= threshold:
+        if score > best_score:
             best_score = score
             best_match = candidate
     
-    if best_match:
+    # Appliquer le seuil
+    if best_score >= threshold:
         return (best_match, best_score)
     
-    return None
+    return (None, best_score)
 
 
 def match_strategies_to_reports(
@@ -207,7 +207,7 @@ def match_strategies_to_reports(
     
     for strat in strategy_names:
         result = find_best_match(strat, report_names, threshold)
-        if result:
+        if result[0] is not None:
             matches[strat] = result
     
     return matches

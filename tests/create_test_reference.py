@@ -77,13 +77,24 @@ def extract_portfolio_report_sample():
     
     pr = pd.read_csv(pr_file, sep=";", decimal=",")
     
-    # Filtrer par stratégies échantillon
-    sample = pr[pr["Strategy"].str.contains("|".join(SAMPLE_STRATEGIES), na=False, case=False)]
+    # Trouver le nom de la colonne stratégie (peut être 'Strategy' ou 'Strategie')
+    strategy_col = None
+    for col in ['Strategy', 'Strategie', 'strategy', 'strategie']:
+        if col in pr.columns:
+            strategy_col = col
+            break
     
-    if len(sample) == 0:
-        print(f"⚠ Aucune stratégie trouvée dans Portfolio Report")
-        # Prendre les 50 premières lignes comme fallback
+    if strategy_col is None:
+        print(f"⚠ Colonne stratégie non trouvée. Colonnes disponibles: {list(pr.columns)[:10]}...")
         sample = pr.head(50)
+    else:
+        # Filtrer par stratégies échantillon
+        sample = pr[pr[strategy_col].str.contains("|".join(SAMPLE_STRATEGIES), na=False, case=False)]
+        
+        if len(sample) == 0:
+            print(f"⚠ Aucune stratégie trouvée dans Portfolio Report")
+            # Prendre les 50 premières lignes comme fallback
+            sample = pr.head(50)
     
     output_file = TEST_DIR / "samples" / "portfolio_report.csv"
     sample.to_csv(output_file, sep=";", index=False)
@@ -109,14 +120,25 @@ def extract_mc_results():
     
     mc_summary = pd.read_csv(summary_file, sep=";", decimal=",")
     
-    # Filtrer par stratégies échantillon
-    sample = mc_summary[mc_summary["Strategy_Name"].str.contains(
-        "|".join(SAMPLE_STRATEGIES), na=False, case=False
-    )]
+    # Trouver le nom de la colonne stratégie
+    strategy_col = None
+    for col in ['Strategy_Name', 'Strategie', 'Strategy', 'strategy_name']:
+        if col in mc_summary.columns:
+            strategy_col = col
+            break
     
-    if len(sample) == 0:
-        print(f"⚠ Aucune stratégie trouvée dans MC Summary")
+    if strategy_col is None:
+        print(f"⚠ Colonne stratégie non trouvée dans MC. Colonnes: {list(mc_summary.columns)[:10]}...")
         sample = mc_summary.head(20)
+    else:
+        # Filtrer par stratégies échantillon
+        sample = mc_summary[mc_summary[strategy_col].str.contains(
+            "|".join(SAMPLE_STRATEGIES), na=False, case=False
+        )]
+        
+        if len(sample) == 0:
+            print(f"⚠ Aucune stratégie trouvée dans MC Summary")
+            sample = mc_summary.head(20)
     
     output_file = TEST_DIR / "expected" / "v1_monte_carlo" / "mc_summary.csv"
     sample.to_csv(output_file, sep=";", index=False)
@@ -135,31 +157,46 @@ def extract_kpis_reference():
     
     pr = pd.read_csv(pr_file, sep=";", decimal=",")
     
-    # Extraire les colonnes KPI pertinentes
-    kpi_columns = [
-        "Strategy", "Net Profit", "Max Drawdown", "Max Drawdown %",
-        "Total Trades", "Avg Trade", "Profit Factor", "Sharpe Ratio"
-    ]
-    
-    # Filtrer les colonnes existantes
-    available_columns = [c for c in kpi_columns if c in pr.columns]
-    kpis = pr[available_columns].copy()
-    
-    # Renommer pour cohérence
-    kpis = kpis.rename(columns={
+    # Mapping des noms de colonnes (français -> anglais normalisé)
+    column_mapping = {
+        # Nom de stratégie
+        "Strategie": "Strategy_Name",
         "Strategy": "Strategy_Name",
+        # KPIs
+        "Net_Profit_Total": "Net_Profit",
+        "Profit_Total": "Net_Profit",
         "Net Profit": "Net_Profit",
+        "Net_Max_Drawdown": "Max_Drawdown",
+        "Max_Drawdown": "Max_Drawdown",
         "Max Drawdown": "Max_Drawdown",
-        "Max Drawdown %": "Max_Drawdown_Pct",
+        "Nombre_Trades": "Total_Trades",
         "Total Trades": "Total_Trades",
+        "Net_Average_Trade": "Avg_Trade",
+        "Average_Trade": "Avg_Trade",
         "Avg Trade": "Avg_Trade",
-        "Profit Factor": "Profit_Factor",
-        "Sharpe Ratio": "Sharpe_Ratio",
-    })
+        "Net_Ratio_NP_DD": "Ratio_NP_DD",
+        "Ratio_NP_DD": "Ratio_NP_DD",
+        "Symbol": "Symbol",
+    }
+    
+    # Trouver les colonnes disponibles
+    available_columns = []
+    rename_dict = {}
+    for col in pr.columns:
+        if col in column_mapping:
+            available_columns.append(col)
+            rename_dict[col] = column_mapping[col]
+    
+    if not available_columns:
+        print(f"⚠ Aucune colonne KPI trouvée. Colonnes: {list(pr.columns)[:15]}...")
+        return
+    
+    kpis = pr[available_columns].copy()
+    kpis = kpis.rename(columns=rename_dict)
     
     output_file = TEST_DIR / "expected" / "v1_kpis" / "kpis_reference.csv"
     kpis.to_csv(output_file, sep=";", index=False)
-    print(f"✓ KPIs référence: {len(kpis)} entrées → {output_file.name}")
+    print(f"✓ KPIs référence: {len(kpis)} entrées, {len(kpis.columns)} colonnes → {output_file.name}")
 
 
 def extract_equity_curves():

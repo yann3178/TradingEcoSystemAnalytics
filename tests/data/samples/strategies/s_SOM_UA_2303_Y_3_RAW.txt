@@ -1,0 +1,156 @@
+input: MyContracts(1);
+input: sessionStartTimeI(1700),sessionEndTimeI(1600);
+var: IsStartOfSession(true);
+array:  ohlcValues[23](0);
+
+input: LevelShiftL(2),LevelShiftS(-5);
+var: MyLETrigger(0),MySETrigger(0);
+input: isActiveCross(1);
+Input: MyStartLE(1800), MyEndLE(1400);
+input: MyStartSE(530),MyEndSE(1430);
+Input: StopMoneyL(4100),StopMoneyS(2100); 
+
+Input: TPBFSessEndL(5500);
+Input: CheckExceedTPTimeL(0);
+var: mp(0);
+input: MyLXTime(200);
+input: BgnTrStopProfitL(6500);
+input: StopMoneyL2(500);
+
+input: ProfitMoneyS(3900);
+input: PtnSYes(-184), PtnLNo(23), PtnSNo(173);
+input:randomValue(0);
+
+IsStartOfSession = _OHLCMulti5Rev2(sessionStartTimeI, sessionEndTimeI, ohlcValues,randomValue);
+
+mp = marketposition;
+var: highd1(0),highd2(0),highd3(0),highd4(0),lowd1(0),closed1(0);
+var: mypivot(0),myS2(0);
+highd1 = ohlcValues[5]; lowd1 = ohlcValues[6]; closed1 = ohlcValues[7];
+highd2 = ohlcValues[9];highd3 = ohlcValues[13];highd4 = ohlcValues[17];
+if isStartOfSession then begin
+	mypivot = (highd1+lowd1+closed1)/3;
+	myS2 = mypivot-highd1+lowd1;
+end;
+//calculate LE SE Trigger
+MyLETrigger = lowd1 + LevelShiftL*TickSize;
+MySETrigger =  myS2 - LevelShiftS*TickSize;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+var: boolMyLETriggerL(true),boolTwL(true);
+var: boolFastNoL(true);
+var: boolMySETriggerS(true),boolTwS(true);
+var: boolFastYesS(true),boolFastNoS(true);
+
+boolMyLETriggerL = close[1]<MyLETrigger and close>MyLETrigger; //LE trigger
+boolTwL = tw(MyStartLE,MyEndLE); //LE Time window
+boolFastNoL = ((highd1> highd2) and (highd1> highd3) and (highd1> highd4))=false; //PatternDirectionalFast 35
+boolMySETriggerS = close[1]>MySETrigger and close<MySETrigger; //SE trigger
+boolTwS = tw(MyStartSE,MyEndSE); //SE Time window
+boolFastYesS = HighestFC(High,5) < HighestFC(High,11); //Pattern Short Yes
+boolFastNoS = (LowestFC(Low,3) > LowestFC(Low,5))=false; // Pattern Short No
+
+if boolMyLETriggerL 
+and boolTwL 
+and boolFastNoL 
+then begin
+	buy("LE") MyContracts contract next bar market;
+end;
+		
+if boolMySETriggerS
+and boolTwS 
+and boolFastYesS and boolFastNoS
+then begin
+	sellshort("SE") MyContracts contract next bar market;
+end;
+
+var: stopLossValueL(0),stopLossValueS(0);
+var: TrailingLX(0);
+var: takeProfitValueS(0);
+var: LXBgnTrStop(0);
+var: HighSinceEntry(0);
+if mp=0 then begin 
+	LXBgnTrStop=0;
+	HighSinceEntry=-999999999;
+end;
+if EntryDate = date and EntryTime = Time and EntryName = "LE" then begin 
+LXBgnTrStop=0;
+mp = 1;
+HighSinceEntry=-999999999;
+end;
+if EntryDate = date and EntryTime = Time and EntryName = "SE" then begin 
+LXBgnTrStop=0;
+mp = -1;
+HighSinceEntry=-999999999;
+end;
+
+// Long Trade if at LXTime and open profit > threshold, then take profit
+If time=MyLXTime and TPBFSessEndL>0 and marketposition = 1 and openpositionprofit>=TPBFSessEndL then begin 
+sell("LX_Mk2") next bar market;
+end;
+
+// for long and short trade: start with a simple stop loss, if open profit > threshold then use  trailing stop
+if openpositionprofit >= BgnTrStopProfitL then LXBgnTrStop = 1;
+if LXBgnTrStop = 0 then stopLossValueL = StopMoneyL else begin 
+HighSinceEntry = maxlist(HighSinceEntry,highest(close,minlist(barssinceentry,maxbarsback-5)+1));
+TrailingLX = HighSinceEntry - StopMoneyL2/bigpointvalue;end;
+
+//simple stop loss for short trade
+stopLossValueS = StopMoneyS;
+
+//Simple take profit for short trade
+takeProfitValueS = ProfitMoneyS;
+
+// in long trade if open profit < threshold use simple stop loss
+if LXBgnTrStop = 0 then begin 
+if (mp=1 or mp=0) and stopLossValueL> 0 then setstoploss(stopLossValueL);
+end;
+
+//Simple take profit for short trade
+if mp=-1 and stopLossValueS> 0 then setstoploss(stopLossValueS);
+
+// in long trade if open profit > threshold use trailing stop loss
+if LXBgnTrStop = 1 then begin 
+if TrailingLX >0 then sell("LX_Tr") next bar at TrailingLX stop;end;
+
+//Simple take profit for short trade
+If mp = -1 and takeProfitValueS> 0 then setprofittarget(takeProfitValueS);
+
+
+var: barssinceentryL(0),barssinceentryS(0);
+barssinceentryL= barssinceentryL+1;
+barssinceentryS= barssinceentryS+1;
+if mp=0 then begin 
+	barssinceentryL=0;
+	barssinceentryS=0;
+end;
+if mp=1 then begin
+	barssinceentryS=0;
+end;
+if mp=-1 then begin
+	barssinceentryL=0;
+end;
+
+if EntryDate = date and EntryTime = Time and (EntryName = "LE" ) then begin 
+barssinceentryL=0;barssinceentryS=0;
+end;
+if EntryDate = date and EntryTime = Time and (EntryName = "SE" ) then begin 
+barssinceentryL=0;barssinceentryS=0;
+end;
+
+//limit trade time
+input: MaxBarsInTradeL(368),MaxBarsInTradeS(270);
+if MaxBarsInTradeL >0 and barssinceentryL>= MaxBarsInTradeL then begin 
+sell("LX_Mk") next bar market;
+end;
+
+if MaxBarsInTradeS>0 and barssinceentryS>= MaxBarsInTradeS then begin 
+buytocover("SX_Mk") next bar market;
+end;
+
+setstopcontract;
+
+//TITAN FAST EXPORT
+input: TitanExportMode(0);
+var: bin(0);
+If TitanExportMode=1 then bin = writedailiesCTitanReports(1080101, TitanExportMode);

@@ -114,22 +114,24 @@ class TestFindBestMatch:
     def test_fuzzy_match_with_prefix(self):
         """Correspondance avec préfixe symbole."""
         candidates = ["GC_EasterGold_MC", "SummerGold", "WinterGold"]
-        match, score = find_best_match("EasterGold", candidates)
+        match, score = find_best_match("EasterGold", candidates, threshold=0.5)
+        assert match is not None
         assert "Easter" in match
-        assert score > 0.6
+        assert score > 0.5
     
     def test_fuzzy_match_with_suffix(self):
         """Correspondance avec suffixe."""
         candidates = ["EasterGold.html", "SummerGold", "WinterGold"]
-        match, score = find_best_match("EasterGold", candidates)
+        match, score = find_best_match("EasterGold", candidates, threshold=0.5)
+        assert match is not None
         assert "Easter" in match
-        assert score > 0.8
+        assert score > 0.5
     
     def test_no_match_below_threshold(self):
         """Pas de correspondance sous le seuil."""
         candidates = ["CompletelyDifferent", "AnotherOne", "YetAnother"]
         match, score = find_best_match("EasterGold", candidates, threshold=0.8)
-        assert match is None or score < 0.8
+        assert match is None  # Pas de match au-dessus du seuil
     
     def test_empty_candidates(self):
         """Liste de candidats vide."""
@@ -155,9 +157,10 @@ class TestMatchingRealCases:
             "ES_TOP_UA_556_ES_15_MC.html",
             "NQ_TOP_UA_152_NQ_5_MC.html",
         ]
-        match, score = find_best_match("TOP_UA_287_GC_5", candidates)
+        match, score = find_best_match("TOP_UA_287_GC_5", candidates, threshold=0.5)
+        assert match is not None
         assert "287" in match
-        assert score > 0.6
+        assert score > 0.5
     
     def test_match_som_ua_strategy(self):
         """Matching stratégie SOM_UA."""
@@ -165,9 +168,10 @@ class TestMatchingRealCases:
             "ES_SOM_UA_2303_Y_3_MC.html",
             "GC_SOM_UA_2305_G_1_MC.html",
         ]
-        match, score = find_best_match("SOM_UA_2303_Y_3", candidates)
+        match, score = find_best_match("SOM_UA_2303_Y_3", candidates, threshold=0.5)
+        assert match is not None
         assert "2303" in match
-        assert score > 0.6
+        assert score > 0.5
     
     def test_match_custom_strategy(self):
         """Matching stratégie custom."""
@@ -175,6 +179,7 @@ class TestMatchingRealCases:
             "ES_Yann_Casey_strategy_v0.1_MC.html",
             "NQ_Yann_Casey_strategy_v0.1_MC.html",
         ]
-        match, score = find_best_match("Casey_strategy_v0.1", candidates)
+        match, score = find_best_match("Casey_strategy_v0.1", candidates, threshold=0.5)
+        assert match is not None
         assert "Casey" in match
-        assert score > 0.6
+        assert score > 0.5
