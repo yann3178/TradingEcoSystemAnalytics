@@ -76,9 +76,9 @@ C:\TradeData\V2\
 
 ---
 
-## 🔄 PROCHAINES ÉTAPES
+### CE QUI A ETE FAIT
 
-### Phase 1: Enrichissement AI Reports (Prioritaire)
+### Enrichissement AI Reports (Prioritaire)
 ```powershell
 cd C:\TradeData\V2
 python run_enrich_ai_reports.py --force
@@ -86,17 +86,13 @@ python run_enrich_ai_reports.py --force
 - Ajouter KPIs depuis Portfolio_Report_V2_27112025.csv
 - Injecter equity curves Chart.js (241 fichiers disponibles)
 
-### Phase 2: Extension Dataset
-- Analyser les ~550 stratégies restantes (800 - 281 déjà analysées)
-- Gérer le budget API Claude (rate limiting, retry)
-- Mettre à jour le tracking pour analyse incrémentale
+## 🔄 PROCHAINES ÉTAPES
 
-### Phase 3: Corrélation & Monte Carlo
-- Générer les matrices de corrélation sur dataset complet
-- Appliquer méthodologie Kevin Davey (R², timeframes multiples)
-- Intégrer résultats Monte Carlo aux rapports HTML
+Développer une user-experience intégrée avec navigation fluide des pages AI Analyzer, Correlation et Monte Carlo : liens vers les pages, look and feel harmonisé
+Vérifier l'exhaustivité du projet
 
-### Phase 4: Accès Mobile & Production
+
+### PLUS TARD : Accès Mobile & Production
 - Configurer Cloudflare Zero Trust (tunnel permanent)
 - Authentification email pour accès sécurisé
 - Optimisation mobile des dashboards

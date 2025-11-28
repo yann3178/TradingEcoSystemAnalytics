@@ -2,164 +2,592 @@
 
 ## 🎯 Vue d'ensemble
 
-Système unifié d'analyse, documentation et suivi des stratégies de trading MultiCharts.
+Système unifié d'analyse, documentation et suivi de **~800 stratégies de trading** MultiCharts avec harmonisation automatique des noms, analyse IA, et dashboards interactifs.
 
-### Fonctionnalités
+### Fonctionnalités Principales
 
-- **Analyse IA** : Classification automatique des stratégies avec Claude
-- **Enrichissement** : Ajout des KPIs et equity curves aux rapports HTML
-- **Dashboard** : Interface web interactive avec filtres et statistiques
-- **Corrélation** : Matrice de corrélation des performances
-- **Accès distant** : Tunnel Cloudflare pour consultation mobile
+- **Mapping Stratégies** : Association automatique stratégie ↔ symbole(s) depuis Portfolio Report
+- **Harmonisation Noms** : Convention unifiée `{Symbol}_{StrategyName}.html` avec backup/rollback
+- **Analyse IA** : Classification automatique des stratégies (8 catégories) avec Claude API
+- **Enrichissement KPI** : Ajout automatique des métriques de performance aux rapports HTML
+- **Equity Curves** : Graphiques interactifs Chart.js avec distinction IS/OOS
+- **Corrélation** : Analyse de corrélation (Pearson + R² Kevin Davey) avec filtres temporels
+- **Dashboard Mobile** : Interface responsive avec authentification Cloudflare
+- **Monte Carlo** : Intégration avec résultats de simulation MC
 
-## 📁 Structure
+---
+
+## 📁 Structure Complète
 
 ```
 C:\TradeData\V2\
 │
-├── config/                     # Configuration centralisée
-│   ├── settings.py             # Tous les paramètres
-│   ├── credentials.json        # Clés API Google
-│   └── instruments_*.csv       # Référentiels
+├── config/                          # Configuration centralisée
+│   ├── settings.py                  # Tous les paramètres système
+│   ├── credentials.json             # Clés API Google Drive
+│   └── instruments_mapping.csv      # Référentiel instruments
 │
-├── data/                       # Données sources (read-only)
-│   ├── mc_export/              # Code PowerLanguage
-│   │   ├── strategies/         # Fichiers .txt des stratégies
-│   │   └── functions/          # Fonctions custom
-│   ├── equity_curves/          # DataSources (profits journaliers)
-│   └── portfolio_reports/      # CSV MultiCharts
+├── data/                            # Données sources (read-only)
+│   ├── mc_export/                   # Export MultiCharts
+│   │   ├── strategies/              # Fichiers PowerLanguage (.txt)
+│   │   └── functions/               # Fonctions custom
+│   ├── equity_curves/               # DataSources (profits journaliers)
+│   └── portfolio_reports/           # CSV Portfolio Reports
+│       └── Portfolio_Report_V2_27112025.csv  ← Source de vérité
 │
-├── src/                        # Code source
-│   ├── analyzers/              # Analyse IA
-│   ├── enrichers/              # Enrichissement HTML
-│   ├── consolidators/          # Consolidation données
-│   ├── generators/             # Génération outputs
-│   └── utils/                  # Utilitaires communs
+├── src/                             # Code source modulaire
+│   ├── analyzers/                   # Analyse IA
+│   │   ├── ai_analyzer.py           # Classification stratégies (Claude)
+│   │   └── html_generator.py        # Génération rapports HTML
+│   ├── enrichers/                   # Enrichissement HTML
+│   │   ├── kpi_enricher.py          # Ajout KPIs de performance
+│   │   └── equity_enricher.py       # Ajout equity curves interactives
+│   ├── consolidators/               # Consolidation données
+│   ├── generators/                  # Génération dashboards
+│   │   └── index_generator.py       # Dashboard principal
+│   └── utils/                       # Utilitaires
+│       ├── strategy_mapper.py       # Mapping stratégie→symbole ⭐ NOUVEAU
+│       └── matching.py              # Fuzzy matching Levenshtein
 │
-├── outputs/                    # Résultats générés
-│   ├── html_reports/           # Rapports + index.html
-│   ├── csv/                    # Exports tabulaires
-│   ├── correlation/            # Matrices de corrélation
-│   └── consolidated/           # Données consolidées
+├── outputs/                         # Résultats générés
+│   ├── html_reports/                # Rapports enrichis
+│   │   ├── {Symbol}_{Strategy}.html         # Rapports harmonisés ⭐
+│   │   ├── {Symbol}_{Strategy}_correlation.html
+│   │   ├── index.html               # Dashboard principal
+│   │   └── mobile-enhancement.html  # Optimisations mobile
+│   ├── csv/                         # Exports tabulaires
+│   ├── correlation/                 # Matrices de corrélation
+│   └── consolidated/                # Données consolidées
+│       ├── strategy_mapping.json            # Mapping complet ⭐ NOUVEAU
+│       ├── migration_report.json            # Rapport migration ⭐ NOUVEAU
+│       └── non_renamed_analysis.json        # Analyse fichiers non migrés ⭐
 │
-├── logs/                       # Logs d'exécution
-├── server/                     # Serveur web + tunnel
-├── docs/                       # Documentation
+├── backups/                         # Backups automatiques ⭐ NOUVEAU
+│   └── {timestamp}/                 # Backup horodaté
+│       ├── html_reports/            # Fichiers sauvegardés
+│       └── manifest.json            # Métadonnées backup
 │
-├── run_pipeline.py             # Script principal
-├── run_enrich.py               # Enrichissement seul
-├── migrate_data.py             # Migration depuis V1
-└── requirements.txt            # Dépendances Python
+├── logs/                            # Logs d'exécution
+├── server/                          # Serveur web + tunnel Cloudflare
+├── docs/                            # Documentation (ce dossier)
+│   ├── README.md                    # Ce fichier
+│   ├── STRATEGY_HARMONIZATION.md    # Guide harmonisation ⭐ NOUVEAU
+│   ├── TOOLS_REFERENCE.md           # Référence outils ⭐ NOUVEAU
+│   └── PROJECT_STATUS.md            # État du projet
+│
+├── run_pipeline.py                  # Pipeline complet IA
+├── run_enrich.py                    # Enrichissement HTML seul
+├── migrate_ai_html_names.py         # Migration noms fichiers ⭐ NOUVEAU
+├── rollback_migration.py            # Restauration backup ⭐ NOUVEAU
+├── verify_migration.py              # Vérification post-migration ⭐ NOUVEAU
+├── analyze_non_renamed.py           # Analyse fichiers non migrés ⭐ NOUVEAU
+├── migrate_data.py                  # Migration V1 → V2
+└── requirements.txt                 # Dépendances Python
 ```
+
+---
 
 ## 🚀 Démarrage Rapide
 
-### 1. Migration des données
+### Option 1 : Pipeline Complet (Première Installation)
 
 ```bash
-# Simulation (sans copie)
-python migrate_data.py --dry-run
+cd C:\TradeData\V2
 
-# Migration réelle
-python migrate_data.py
-```
+# 1. Migration des données depuis V1 (si nécessaire)
+python migrate_data.py --dry-run     # Simulation
+python migrate_data.py               # Migration réelle
 
-### 2. Configuration
-
-Éditer `config/settings.py` si nécessaire :
-
-```python
-# Clé API Claude
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-
-# Mode prototype (limiter le nombre de stratégies)
-MAX_STRATEGIES = 10  # 0 = toutes
-```
-
-### 3. Exécution
-
-```bash
-# Pipeline complet
+# 2. Analyse IA + Enrichissement + Dashboard
 python run_pipeline.py
 
-# Enrichissement seul
+# 3. Harmonisation des noms (recommandé)
+python migrate_ai_html_names.py --dry-run   # Prévisualisation
+python migrate_ai_html_names.py             # Exécution
+python verify_migration.py                  # Vérification
+```
+
+### Option 2 : Enrichissement Seul (Utilisation Quotidienne)
+
+```bash
+# Enrichir les rapports HTML existants
 python run_enrich.py
 
 # Avec options
 python run_enrich.py --force --no-backup
 ```
 
-## 📊 Pipeline
+### Option 3 : Harmonisation Seule (Après Génération de Nouveaux Rapports)
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    RUN_PIPELINE.PY                      │
-└─────────────────────────────────────────────────────────┘
-                          │
-    ┌─────────────────────┼─────────────────────┐
-    ▼                     ▼                     ▼
-┌─────────┐        ┌─────────────┐       ┌───────────┐
-│ ANALYZE │        │ CONSOLIDATE │       │  ENRICH   │
-│ (IA)    │        │             │       │           │
-└────┬────┘        └──────┬──────┘       └─────┬─────┘
-     │                    │                    │
-     └──────────┬─────────┘────────────────────┘
-                ▼
-         ┌─────────────┐
-         │  DASHBOARD  │
-         │  (index)    │
-         └─────────────┘
+```bash
+# Si tu viens de générer de nouveaux rapports HTML
+python migrate_ai_html_names.py --dry-run
+python migrate_ai_html_names.py
+python verify_migration.py
 ```
 
-## 🔧 Modules
+---
 
-### enrichers/kpi_enricher.py
+## 📊 Architecture du Pipeline
 
-Ajoute les indicateurs de performance :
+### Pipeline Complet
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                    RUN_PIPELINE.PY                           │
+│  (Analyse IA → Consolidation → Enrichissement → Dashboard)  │
+└──────────────────────────────────────────────────────────────┘
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        ▼                     ▼                     ▼
+  ┌──────────┐         ┌─────────────┐      ┌─────────────┐
+  │ ANALYZE  │         │ CONSOLIDATE │      │   ENRICH    │
+  │ (IA)     │────────▶│             │─────▶│ (KPI+Equity)│
+  └──────────┘         └─────────────┘      └──────┬──────┘
+                                                    │
+                                                    ▼
+                                             ┌─────────────┐
+                                             │  DASHBOARD  │
+                                             │ (index.html)│
+                                             └─────────────┘
+```
+
+### Workflow Harmonisation des Noms
+
+```
+┌────────────────────────────────────────────────────────────┐
+│              SYSTÈME D'HARMONISATION                       │
+└────────────────────────────────────────────────────────────┘
+                            │
+      ┌─────────────────────┼──────────────────────┐
+      ▼                     ▼                      ▼
+┌────────────┐      ┌───────────────┐     ┌──────────────┐
+│  MAPPING   │      │   MIGRATION   │     │ VÉRIFICATION │
+│ (mapper.py)│─────▶│ (migrate.py)  │────▶│ (verify.py)  │
+└────────────┘      └───────────────┘     └──────────────┘
+      │                     │                      │
+      │                     ▼                      ▼
+      │              ┌───────────┐          ┌──────────┐
+      │              │  BACKUP   │          │ ANALYSIS │
+      │              │ (rollback)│          │ (analyze)│
+      │              └───────────┘          └──────────┘
+      │
+      ▼
+┌─────────────────────────────────────────┐
+│ Portfolio Report CSV (Source de vérité) │
+│  243 stratégies → symboles mappées      │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## 🔧 Modules Principaux
+
+### 1. Strategy Mapper (`src/utils/strategy_mapper.py`)
+
+**Nouveau système de mapping stratégie → symbole(s)**
+
+```python
+from src.utils.strategy_mapper import StrategyMapper
+
+mapper = StrategyMapper()
+mapper.load_portfolio_report()
+
+# Récupérer symbole(s) pour une stratégie
+symbols = mapper.get_symbols_for_strategy("SOM_UA_2302_G_5")
+# Retourne: ["CL"]
+
+# Recherche floue
+result = mapper.find_strategy_fuzzy("SOM UA 2302")
+# Retourne la meilleure correspondance
+
+# Statistiques
+mapper.print_statistics()
+# 243 stratégies uniques, ratio 1:1 stratégie-symbole
+```
+
+**Fonctionnalités :**
+- Chargement automatique du Portfolio Report
+- Mapping bidirectionnel (stratégie ↔ symbole)
+- Recherche floue avec Levenshtein
+- Export JSON pour réutilisation
+- Gestion stratégies multi-symboles
+
+### 2. Migration des Noms (`migrate_ai_html_names.py`)
+
+**Renommage automatique avec sécurité maximale**
+
+```bash
+# Prévisualisation (sans modification)
+python migrate_ai_html_names.py --dry-run
+
+# Exécution réelle (avec backup automatique)
+python migrate_ai_html_names.py
+
+# Sans backup (non recommandé)
+python migrate_ai_html_names.py --no-backup
+```
+
+**Fonctionnalités :**
+- Backup automatique complet avant migration
+- Détection intelligente des fichiers à traiter
+- Exclusion automatique : `*_correlation.html`, `*.bak`, `index*.html`
+- Format cible : `{Symbol}_{StrategyName}.html`
+- Rapport JSON détaillé : succès, warnings, erreurs
+- Mode dry-run pour vérification
+
+**Exemple de transformation :**
+```
+Avant : SOM_UA_2302_G_5.html
+Après : CL_SOM_UA_2302_G_5.html
+```
+
+### 3. Rollback (`rollback_migration.py`)
+
+**Restauration instantanée en cas de problème**
+
+```bash
+# Lister les backups disponibles
+python rollback_migration.py --list
+
+# Prévisualiser la restauration
+python rollback_migration.py --backup 20251128_232216 --dry-run
+
+# Restaurer
+python rollback_migration.py --backup 20251128_232216
+```
+
+### 4. Vérification (`verify_migration.py`)
+
+**5 checks automatiques post-migration**
+
+```bash
+python verify_migration.py
+```
+
+Vérifie :
+1. ✅ Existence et validité du rapport de migration
+2. ✅ Comptage des fichiers (total, main, correlation, index)
+3. ✅ Patterns de nommage (% avec préfixe symbole)
+4. ✅ Existence d'un backup récent
+5. ✅ Distribution des symboles
+
+### 5. Enrichissement KPI (`enrichers/kpi_enricher.py`)
+
+**Ajoute les indicateurs de performance aux rapports HTML**
+
+Métriques ajoutées :
 - Net Profit, Max Drawdown, Ratio NP/DD
 - IS/OOS Monthly Returns, Efficiency Ratio
 - YTD Profit, Avg Trade, % Exposition
 - Performance par période (M, M-1, W, YTD, Y-1)
 
-### enrichers/equity_enricher.py
+### 6. Enrichissement Equity (`enrichers/equity_enricher.py`)
 
-Ajoute les graphiques d'equity curve :
-- Chart.js interactif
+**Ajoute les graphiques d'equity curve interactifs**
+
+Fonctionnalités :
+- Chart.js responsive
 - Distinction visuelle IS/OOS
 - Ligne de démarcation OOS
+- Tooltips interactifs
+- Cleanup automatique pour ré-enrichissement
 
-### utils/matching.py
+### 7. Analyse IA (`analyzers/ai_analyzer.py`)
 
-Algorithmes de correspondance :
-- Distance de Levenshtein
-- Normalisation des noms
-- Fuzzy matching avec seuil configurable
+**Classification automatique avec Claude API**
+
+8 catégories de stratégies :
+1. BREAKOUT - Cassures de niveaux
+2. MEAN_REVERSION - Retour à la moyenne
+3. TREND_FOLLOWING - Suivi de tendance
+4. MOMENTUM - Dynamique des prix
+5. PATTERN - Patterns chartistes
+6. VOLATILITY - Exploitation volatilité
+7. TIME_BASED - Basées sur horaires
+8. HYBRID - Approches mixtes
+
+---
 
 ## ⚙️ Configuration
 
 ### Variables d'environnement
 
 ```bash
+# Windows
 set ANTHROPIC_API_KEY=sk-ant-...
+
+# Linux/Mac
+export ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-### settings.py
+### Paramètres Système (`config/settings.py`)
 
 | Paramètre | Description | Défaut |
 |-----------|-------------|--------|
-| `MAX_STRATEGIES` | Limite (0=toutes) | 0 |
-| `FUZZY_MATCH_THRESHOLD` | Seuil matching | 0.80 |
-| `MIN_MATCH_CHARS` | Min caractères | 5 |
-| `CLAUDE_MODEL` | Modèle IA | claude-sonnet-4-20250514 |
+| **Général** |
+| `MAX_STRATEGIES` | Limite de stratégies (0=toutes) | `0` |
+| `FUZZY_MATCH_THRESHOLD` | Seuil de matching | `0.80` |
+| `MIN_MATCH_CHARS` | Min caractères pour matching | `5` |
+| **IA** |
+| `CLAUDE_MODEL` | Modèle Claude | `claude-sonnet-4-20250514` |
+| `ANTHROPIC_API_KEY` | Clé API Claude | Var. env. |
+| **Harmonisation** |
+| `PORTFOLIO_REPORT_PATH` | Chemin Portfolio Report | Auto-détecté |
+| `HTML_REPORTS_DIR` | Dossier rapports HTML | `outputs/html_reports` |
+| `BACKUP_DIR` | Dossier backups | `backups/` |
+
+---
+
+## 📚 Documentation Détaillée
+
+### Guides Disponibles
+
+- **[STRATEGY_HARMONIZATION.md](STRATEGY_HARMONIZATION.md)** - Guide complet du système d'harmonisation
+  - Concepts et architecture
+  - Workflows détaillés
+  - Cas d'usage et exemples
+  - Troubleshooting
+
+- **[TOOLS_REFERENCE.md](TOOLS_REFERENCE.md)** - Référence complète des outils
+  - Tous les scripts Python
+  - Options de ligne de commande
+  - APIs et fonctions
+  - Exemples d'utilisation
+
+- **[PROJECT_STATUS.md](PROJECT_STATUS.md)** - État actuel du projet
+  - Fonctionnalités implémentées
+  - Statistiques système
+  - Roadmap et prochaines étapes
+
+---
+
+## 🎯 Cas d'Usage Courants
+
+### Cas 1 : Nouveaux Rapports HTML Générés
+
+Tu viens de générer de nouveaux rapports avec l'analyse IA :
+
+```bash
+# 1. Harmoniser les noms
+python migrate_ai_html_names.py --dry-run
+python migrate_ai_html_names.py
+
+# 2. Vérifier
+python verify_migration.py
+
+# 3. Analyser fichiers non renommés (optionnel)
+python analyze_non_renamed.py
+```
+
+### Cas 2 : Enrichir les Rapports Existants
+
+Tu as déjà des rapports et veux ajouter KPIs + equity curves :
+
+```bash
+# Enrichissement avec backup automatique
+python run_enrich.py
+
+# Forcer le ré-enrichissement
+python run_enrich.py --force
+```
+
+### Cas 3 : Problème Après Migration
+
+Quelque chose ne va pas après la migration :
+
+```bash
+# 1. Lister les backups
+python rollback_migration.py --list
+
+# 2. Restaurer
+python rollback_migration.py --backup 20251128_232216
+
+# 3. Vérifier
+dir C:\TradeData\V2\outputs\html_reports\*.html | select -first 10
+```
+
+### Cas 4 : Analyse Complète Depuis Zéro
+
+Tu veux tout refaire from scratch :
+
+```bash
+# Pipeline complet
+python run_pipeline.py              # Analyse IA + génération rapports
+python migrate_ai_html_names.py     # Harmonisation
+python verify_migration.py          # Vérification
+```
+
+---
+
+## 📊 Statistiques du Système
+
+### Données Actuelles (27 Nov 2025)
+
+- **Stratégies totales** : ~800 stratégies MultiCharts
+- **Stratégies backtestées** : 243 (Portfolio Report)
+- **Stratégies avec rapports HTML** : 581
+- **Stratégies harmonisées** : 235 (96.7% des backtestées)
+- **Symboles traités** : 39 (FDAX, NQ, ES, GC, CL, etc.)
+- **Fichiers de corrélation** : 245
+
+### Performance
+
+- **Temps analyse IA** : ~2-3 min/stratégie (avec rate limiting)
+- **Temps enrichissement** : ~1-2 sec/fichier
+- **Temps migration** : <10 secondes (581 fichiers)
+- **Temps rollback** : ~5 secondes
+
+---
+
+## 🔄 Workflow Complet Recommandé
+
+### Setup Initial (Une fois)
+
+```bash
+# 1. Cloner/Installer
+cd C:\TradeData\V2
+
+# 2. Configurer
+# Éditer config/settings.py si besoin
+
+# 3. Migrer données V1 (si applicable)
+python migrate_data.py
+```
+
+### Utilisation Quotidienne
+
+```bash
+# Pipeline rapide (sans IA)
+python run_enrich.py
+
+# Pipeline complet (avec IA pour nouvelles stratégies)
+python run_pipeline.py
+python migrate_ai_html_names.py
+python verify_migration.py
+```
+
+### Maintenance Mensuelle
+
+```bash
+# Nettoyer anciens backups (>30 jours)
+# Voir backups/
+
+# Mettre à jour Portfolio Report
+# Copier nouveau CSV vers data/portfolio_reports/
+
+# Re-mapper stratégies
+python -c "from src.utils.strategy_mapper import StrategyMapper; m=StrategyMapper(); m.load_portfolio_report(); m.export_to_json()"
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Problème : Fichiers non renommés
+
+**Symptôme :** `verify_migration.py` montre beaucoup de fichiers sans préfixe symbole
+
+**Solution :**
+```bash
+# Analyser les fichiers non renommés
+python analyze_non_renamed.py
+
+# Vérifier s'ils sont dans le Portfolio Report
+findstr "NomStrategie" C:\TradeData\V2\data\portfolio_reports\Portfolio_Report_V2_27112025.csv
+```
+
+**Cause courante :** Stratégies non backtestées (normal, à conserver telles quelles)
+
+### Problème : Erreur de matching
+
+**Symptôme :** "No symbol found for strategy: XYZ"
+
+**Solution :**
+```python
+# Vérifier le mapping
+from src.utils.strategy_mapper import StrategyMapper
+mapper = StrategyMapper()
+mapper.load_portfolio_report()
+
+# Recherche floue
+result = mapper.find_strategy_fuzzy("XYZ")
+print(result)
+```
+
+### Problème : Backup échoue
+
+**Symptôme :** Migration échoue à créer le backup
+
+**Solution :**
+```bash
+# Vérifier espace disque
+dir C:\TradeData\V2\backups
+
+# Lancer sans backup (attention !)
+python migrate_ai_html_names.py --no-backup
+```
+
+---
 
 ## 📝 Changelog
 
+### V2.1.0 (2025-11-28) ⭐ NOUVEAU
+
+**Harmonisation des Noms de Fichiers**
+- ✅ Système de mapping stratégie → symbole (`strategy_mapper.py`)
+- ✅ Migration automatique avec backup (`migrate_ai_html_names.py`)
+- ✅ Rollback instantané (`rollback_migration.py`)
+- ✅ Vérification post-migration (`verify_migration.py`)
+- ✅ Analyse fichiers non migrés (`analyze_non_renamed.py`)
+- ✅ Convention unifiée : `{Symbol}_{StrategyName}.html`
+- ✅ 235/243 stratégies backtestées harmonisées (96.7%)
+
 ### V2.0.0 (2025-11-27)
-- Refactorisation complète de la structure
-- Modules séparés et réutilisables
-- Configuration centralisée
-- Migration depuis V1 sans perte
+
+**Refactorisation Complète**
+- ✅ Architecture modulaire (analyzers, enrichers, consolidators, generators)
+- ✅ Configuration centralisée (`config/settings.py`)
+- ✅ Enrichissement KPI automatique
+- ✅ Equity curves Chart.js interactives
+- ✅ Dashboard mobile-friendly
+- ✅ Migration V1 → V2 sans perte
+
+---
 
 ## 📞 Support
 
-Voir les logs dans `logs/` pour le diagnostic.
+### Logs
+
+Tous les logs dans `logs/` avec horodatage :
+```
+logs/
+├── migration_20251128_232216.log
+├── enrichment_20251127_141500.log
+└── pipeline_20251127_093000.log
+```
+
+### Rapports
+
+Rapports JSON détaillés dans `outputs/consolidated/` :
+```
+outputs/consolidated/
+├── strategy_mapping.json          # Mapping complet
+├── migration_report.json          # Détails migration
+└── non_renamed_analysis.json      # Analyse fichiers non migrés
+```
+
+---
+
+## 🎓 Ressources
+
+- **Documentation MultiCharts** : https://www.multicharts.com/documentation
+- **Claude API** : https://docs.anthropic.com/claude/reference
+- **Chart.js** : https://www.chartjs.org/docs/
+- **Kevin Davey** : *Building Winning Algorithmic Trading Systems*
+
+---
+
+**Version** : 2.1.0  
+**Dernière mise à jour** : 28 novembre 2025  
+**Auteur** : Trading Analytics V2 Pipeline

@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOM_UA_2302_Y_7_NQ - Analyse de Corrélation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        
+        /* Navigation */
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .nav-link:hover { background: #2980b9; transform: translateY(-2px); }
+        .nav-link.secondary { background: #95a5a6; }
+        .nav-link.secondary:hover { background: #7f8c8d; }
+        
+        /* Header */
+        .header {
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+        
+        /* Score Badge */
+        .score-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        .score-badge.diversifiant { background: linear-gradient(135deg, #d4efdf 0%, #a9dfbf 100%); color: #1e8449; }
+        .score-badge.modere { background: linear-gradient(135deg, #fef9e7 0%, #f9e79f 100%); color: #b7950b; }
+        .score-badge.correle { background: linear-gradient(135deg, #fdebd0 0%, #f5b041 100%); color: #af601a; }
+        .score-badge.tres-correle { background: linear-gradient(135deg, #fadbd8 0%, #f1948a 100%); color: #922b21; }
+        
+        .score-number {
+            font-size: 1.5em;
+            padding: 5px 15px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 8px;
+        }
+        
+        /* Sections */
+        h2 {
+            color: #34495e;
+            margin: 30px 0 20px 0;
+            padding-left: 15px;
+            border-left: 4px solid #3498db;
+            font-size: 1.4em;
+        }
+        h3 {
+            color: #5d6d7e;
+            margin: 20px 0 15px 0;
+            font-size: 1.1em;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .stat-value.positive { color: #27ae60; }
+        .stat-value.negative { color: #e74c3c; }
+        .stat-value.warning { color: #f39c12; }
+        .stat-label {
+            font-size: 0.85em;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        .stat-sub {
+            font-size: 0.75em;
+            color: #95a5a6;
+            margin-top: 3px;
+        }
+        
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        .comparison-table th, .comparison-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .comparison-table th {
+            background: #34495e;
+            color: white;
+            font-weight: 600;
+        }
+        .comparison-table tr:hover {
+            background: #f8f9fa;
+        }
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* Correlation indicators */
+        .corr-high { color: #e74c3c; font-weight: bold; }
+        .corr-medium { color: #f39c12; }
+        .corr-low { color: #27ae60; }
+        .corr-negative { color: #3498db; }
+        
+        .delta-positive { color: #e74c3c; }
+        .delta-positive::before { content: '↗ '; }
+        .delta-negative { color: #27ae60; }
+        .delta-negative::before { content: '↘ '; }
+        
+        .trend-up { color: #e74c3c; }
+        .trend-down { color: #27ae60; }
+        .trend-stable { color: #95a5a6; }
+        
+        /* Cluster badge */
+        .cluster-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            background: #ecf0f1;
+            color: #5d6d7e;
+        }
+        
+        /* Alerts */
+        .alerts-container {
+            margin: 20px 0;
+        }
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .alert-icon {
+            font-size: 1.3em;
+        }
+        .alert.success {
+            background: #d4efdf;
+            border-left: 4px solid #27ae60;
+            color: #1e8449;
+        }
+        .alert.info {
+            background: #d6eaf8;
+            border-left: 4px solid #3498db;
+            color: #21618c;
+        }
+        .alert.warning {
+            background: #fef9e7;
+            border-left: 4px solid #f1c40f;
+            color: #9a7d0a;
+        }
+        .alert.danger {
+            background: #fadbd8;
+            border-left: 4px solid #e74c3c;
+            color: #922b21;
+        }
+        .alert.alert {
+            background: #fdebd0;
+            border-left: 4px solid #e67e22;
+            color: #a04000;
+        }
+        
+        /* Distribution */
+        .distribution-bar {
+            display: flex;
+            height: 30px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        .dist-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8em;
+            font-weight: bold;
+            min-width: 30px;
+        }
+        .dist-segment.very-neg { background: #3498db; }
+        .dist-segment.neg { background: #5dade2; }
+        .dist-segment.neutral { background: #95a5a6; }
+        .dist-segment.pos { background: #f5b041; }
+        .dist-segment.very-pos { background: #e74c3c; }
+        
+        .distribution-legend {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.85em;
+            color: #7f8c8d;
+        }
+        
+        /* Cluster Distribution */
+        .cluster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+        }
+        .cluster-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+        }
+        .cluster-name {
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+        .cluster-stats {
+            font-size: 0.9em;
+            color: #5d6d7e;
+        }
+        .cluster-bar {
+            height: 6px;
+            background: #ecf0f1;
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .cluster-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+        
+        /* Strategy link */
+        .strategy-link {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .strategy-link:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+            text-align: center;
+            color: #95a5a6;
+            font-size: 0.9em;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            h1 { font-size: 1.5em; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .comparison-table { font-size: 0.85em; }
+        }
+    </style>
+<style>
+    /* === KPI DASHBOARD === */
+    .kpi-dashboard {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        padding: 25px;
+        margin: 25px 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .kpi-dashboard h2 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+        border-left: 4px solid #3498db;
+        padding-left: 15px;
+    }
+    
+    .kpi-dashboard h3 {
+        color: #34495e;
+        margin: 20px 0 15px 0;
+        font-size: 1.1em;
+    }
+    
+    .kpi-header-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .kpi-chip {
+        background: white;
+        border-radius: 20px;
+        padding: 8px 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .chip-label { color: #7f8c8d; font-size: 0.85em; }
+    .chip-value { font-weight: 600; color: #2c3e50; }
+    
+    .kpi-main-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .kpi-secondary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    
+    .kpi-card {
+        background: white;
+        border-radius: 10px;
+        padding: 15px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    
+    .kpi-card.main { padding: 20px; }
+    .kpi-card.main .kpi-value { font-size: 1.8em; }
+    
+    .kpi-title {
+        color: #7f8c8d;
+        font-size: 0.85em;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .kpi-value {
+        font-size: 1.4em;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+    
+    .kpi-value.positive { color: #27ae60; }
+    .kpi-value.negative { color: #e74c3c; }
+    .kpi-value.neutral { color: #7f8c8d; }
+    .kpi-subtitle { font-size: 0.8em; color: #95a5a6; margin-top: 5px; }
+    
+    /* === IS/OOS SECTION === */
+    .isoos-section {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+    
+    .isoos-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .isoos-badge {
+        padding: 12px 20px;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .isoos-badge.is {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+    }
+    
+    .isoos-badge.oos {
+        background: linear-gradient(135deg, #27ae60 0%, #219a52 100%);
+        color: white;
+    }
+    
+    .badge-label { font-size: 0.8em; opacity: 0.9; }
+    .badge-value { font-weight: 600; }
+    .badge-duration { font-size: 0.85em; opacity: 0.9; }
+    
+    .isoos-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+    }
+    
+    /* === PERIOD TABLE === */
+    .period-section {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+        overflow-x: auto;
+    }
+    
+    .period-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95em;
+    }
+    
+    .period-table th {
+        background: #f8f9fa;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .period-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .period-table tr:hover { background: #f8f9fa; }
+    .period-table .positive { color: #27ae60; font-weight: 500; }
+    .period-table .negative { color: #e74c3c; font-weight: 500; }
+    
+    /* === EQUITY CURVE === */
+    .equity-section {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin: 25px 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .equity-section h2 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        border-left: 4px solid #27ae60;
+        padding-left: 15px;
+    }
+    
+    .equity-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 15px;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9em;
+    }
+    
+    .legend-item .legend-color {
+        width: 20px;
+        height: 4px;
+        border-radius: 2px;
+    }
+    
+    .legend-item.is .legend-color { background: #3498db; }
+    .legend-item.oos .legend-color { background: #27ae60; }
+    .legend-item.separator { color: #e74c3c; font-weight: 500; }
+    
+    .chart-container {
+        position: relative;
+        height: 400px;
+        width: 100%;
+    }
+    
+    .equity-source {
+        margin-top: 10px;
+        text-align: right;
+        color: #95a5a6;
+    }
+    
+    .no-data {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        color: #856404;
+    }
+    
+    /* === RESPONSIVE === */
+    @media (max-width: 768px) {
+        .kpi-main-grid { grid-template-columns: repeat(2, 1fr); }
+        .kpi-secondary-grid { grid-template-columns: repeat(2, 1fr); }
+        .chart-container { height: 300px; }
+    }
+</style>
+
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="nav-bar">
+            <div>
+                <a href="SOM_UA_2302_Y_7.html" class="nav-link">← Rapport Stratégie</a>
+                <a href="index.html" class="nav-link secondary">📊 Dashboard</a>
+            </div>
+            <a href="../Results/Correlation/correlation_dashboard_latest.html" class="nav-link secondary">🔗 Index Corrélation Global</a>
+        </nav>
+        
+        <!-- Header -->
+        <div class="header">
+            <h1>📊 SOM_UA_2302_Y_7_NQ</h1>
+
+        <div class="kpi-dashboard">
+            <h2>📈 Performance Dashboard</h2>
+            <div class="no-data">
+                <p>⚠️ KPIs not available for this strategy in Portfolio Report.</p>
+            </div>
+        </div>
+        
+
+    <div class="equity-section">
+        <h2>📈 Equity Curve</h2>
+        <div class="no-data">
+            <p>⚠️ Equity curve data not available (no matching DataSource file).</p>
+        </div>
+    </div>
+    
+            <p class="subtitle">Analyse de Corrélation • Marché: <span class="cluster-badge">Equity Indices US</span></p>
+            
+            <div class="score-badge tres-correle">
+                <span>🔴 Très corrélé</span>
+                <span class="score-number">Score: 14.0</span>
+            </div>
+        </div>
+        
+        <!-- Alertes -->
+        <div class="alerts-container" id="alertsContainer"></div>
+        
+        <!-- Résumé -->
+        <h2>📈 Profil de Corrélation</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">14</div>
+                <div class="stat-label">Stratégies corrélées (LT)</div>
+                <div class="stat-sub">Seuil: |r| > 0.6</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">14</div>
+                <div class="stat-label">Stratégies corrélées (CT)</div>
+                <div class="stat-sub">12 derniers mois</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">0.213</div>
+                <div class="stat-label">Corrélation moyenne (LT)</div>
+                <div class="stat-sub">Depuis 2012</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">0.259</div>
+                <div class="stat-label">Corrélation moyenne (CT)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value ">+0.046</div>
+                <div class="stat-label">Delta (CT - LT)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value warning">0.736</div>
+                <div class="stat-label">Corrélation Max (LT)</div>
+                <div class="stat-sub" title="TOP_UA_156_NQ_15_NQ">TOP_UA_156_NQ_15_NQ...</div>
+            </div>
+        </div>
+        
+        <!-- Distribution -->
+        <h2>📊 Distribution des Corrélations</h2>
+        <div id="distributionContainer"></div>
+        
+        <!-- Clusters -->
+        <h2>🌍 Corrélations par Cluster de Marché</h2>
+        <div class="cluster-grid" id="clusterGrid"></div>
+        
+        <!-- Top Corrélées -->
+        <h2>🔝 Top 0.6 Stratégies les Plus Corrélées</h2>
+        <div class="table-container">
+            <table class="comparison-table" id="mostCorrTable">
+                <thead>
+                    <tr>
+                        <th>Rang</th>
+                        <th>Stratégie</th>
+                        <th>Symbole</th>
+                        <th>Cluster</th>
+                        <th>Corr. LT</th>
+                        <th>Corr. CT</th>
+                        <th>Delta</th>
+                        <th>Tendance</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        
+        <!-- Moins Corrélées -->
+        <h2>🔻 Top 0.6 Stratégies les Moins Corrélées (Diversification)</h2>
+        <div class="table-container">
+            <table class="comparison-table" id="leastCorrTable">
+                <thead>
+                    <tr>
+                        <th>Rang</th>
+                        <th>Stratégie</th>
+                        <th>Symbole</th>
+                        <th>Cluster</th>
+                        <th>Corr. LT</th>
+                        <th>Corr. CT</th>
+                        <th>Delta</th>
+                        <th>Potentiel</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>Généré le 27/11/2025 à 15:04 • Méthode Kevin Davey</p>
+            <p>Seuil corrélation: 0.6 • Période LT: depuis 2012 • Période CT: 12 mois</p>
+        </div>
+    </div>
+
+    <script>
+        const mostCorrData = [{"strategy": "TOP_UA_152_NQ_5_NQ", "symbol": "NQ", "cluster": "Equity Indices US", "corr_lt": 0.663, "corr_ct": 0.836, "delta": 0.173, "max_abs": 0.8360662334572627}, {"strategy": "SOM_UA_2406_G_1_NQ", "symbol": "NQ", "cluster": "Equity Indices US", "corr_lt": 0.733, "corr_ct": 0.816, "delta": 0.084, "max_abs": 0.8164582602798619}, {"strategy": "SOM_UA_2407_G_4_ES", "symbol": "ES", "cluster": "Equity Indices US", "corr_lt": 0.646, "corr_ct": 0.8, "delta": 0.154, "max_abs": 0.8001235880905161}, {"strategy": "TOP_UA_156_NQ_15_NQ", "symbol": "NQ", "cluster": "Equity Indices US", "corr_lt": 0.736, "corr_ct": 0.77, "delta": 0.034, "max_abs": 0.7704647368621446}, {"strategy": "TOP_UA_92_US_60_US", "symbol": "US", "cluster": "Bonds", "corr_lt": 0.128, "corr_ct": 0.766, "delta": 0.638, "max_abs": 0.7660255114614569}, {"strategy": "SOM_UA_2307_Y_1_ES", "symbol": "ES", "cluster": "Equity Indices US", "corr_lt": 0.289, "corr_ct": 0.759, "delta": 0.47, "max_abs": 0.758894135906945}, {"strategy": "SOM_UA_2407_G_2_NQ", "symbol": "NQ", "cluster": "Equity Indices US", "corr_lt": 0.731, "corr_ct": null, "delta": null, "max_abs": 0.7307803580287161}, {"strategy": "SOM_UA_2407_G_3_NQ", "symbol": "NQ", "cluster": "Equity Indices US", "corr_lt": 0.722, "corr_ct": 0.667, "delta": -0.054, "max_abs": 0.7216906224688483}, {"strategy": "SOM_UA_2307_Y_6_NQ", "symbol": "NQ", "cluster": "Equity Indices US", "corr_lt": 0.699, "corr_ct": 0.715, "delta": 0.015, "max_abs": 0.7146794309868072}, {"strategy": "SOM_UA_2405_G_1_NQ", "symbol": "NQ", "cluster": "Equity Indices US", "corr_lt": 0.712, "corr_ct": 0.477, "delta": -0.235, "max_abs": 0.7123612095740027}, {"strategy": "SOM_UA_2411_G_2_NQ", "symbol": "NQ", "cluster": "Equity Indices US", "corr_lt": 0.682, "corr_ct": 0.564, "delta": -0.118, "max_abs": 0.6818036652335785}, {"strategy": "SOM_UA_2409_W_NQ", "symbol": "NQ", "cluster": "Equity Indices US", "corr_lt": 0.635, "corr_ct": 0.655, "delta": 0.02, "max_abs": 0.654619099508652}, {"strategy": "SOM_UA_2501_G_1_NQ", "symbol": "NQ", "cluster": "Equity Indices US", "corr_lt": 0.653, "corr_ct": 0.615, "delta": -0.039, "max_abs": 0.6534465045346967}, {"strategy": "TOP_UA_342_NQ_15_NQ", "symbol": "NQ", "cluster": "Equity Indices US", "corr_lt": 0.647, "corr_ct": 0.458, "delta": -0.189, "max_abs": 0.6467563324378409}, {"strategy": "TOP_UA_685_GC_15_GC", "symbol": "GC", "cluster": "Metals", "corr_lt": 0.309, "corr_ct": 0.642, "delta": 0.333, "max_abs": 0.6422073535788355}];
+        const leastCorrData = [{"strategy": "SOM_UA_2311_G_3_GC", "symbol": "GC", "cluster": "Metals", "corr_lt": 0.012, "corr_ct": null, "delta": null, "max_abs": 0.012180487477660986}, {"strategy": "SOM_UA_2403_G_4_CL", "symbol": "CL", "cluster": "Energy", "corr_lt": 0.014, "corr_ct": -0.014, "delta": -0.028, "max_abs": 0.01414834600333667}, {"strategy": "TOP_UA_547_LC_5_LC", "symbol": "LC", "cluster": "Grains", "corr_lt": 0.016, "corr_ct": null, "delta": null, "max_abs": 0.016140432261621734}, {"strategy": "SOM_UA_2311_G_2_GC", "symbol": "GC", "cluster": "Metals", "corr_lt": -0.017, "corr_ct": null, "delta": null, "max_abs": 0.017141995208911097}, {"strategy": "SOM_UA_2311_W_NQ", "symbol": "NQ", "cluster": "Equity Indices US", "corr_lt": 0.022, "corr_ct": null, "delta": null, "max_abs": 0.021997328024959437}, {"strategy": "SOM_UA_2310_G_1_S", "symbol": "S", "cluster": "Equity Indices US", "corr_lt": -0.026, "corr_ct": null, "delta": null, "max_abs": 0.02576001521128934}, {"strategy": "SOM_UA_2401_G_5_C", "symbol": "C", "cluster": "Energy", "corr_lt": 0.009, "corr_ct": 0.027, "delta": 0.018, "max_abs": 0.027083941707813256}, {"strategy": "TOP_UA_120_CL_15_CL", "symbol": "CL", "cluster": "Energy", "corr_lt": -0.0, "corr_ct": 0.028, "delta": 0.028, "max_abs": 0.027761523195230713}, {"strategy": "SOM_UA_2411_G_1_EC", "symbol": "EC", "cluster": "Currencies", "corr_lt": 0.01, "corr_ct": 0.028, "delta": 0.018, "max_abs": 0.02797244711806425}, {"strategy": "SOM_UA_2310_W_CL", "symbol": "CL", "cluster": "Energy", "corr_lt": 0.0, "corr_ct": 0.028, "delta": 0.028, "max_abs": 0.028085895603214377}, {"strategy": "SOM_UA_2404_G_4_S", "symbol": "S", "cluster": "Equity Indices US", "corr_lt": -0.03, "corr_ct": null, "delta": null, "max_abs": 0.029590441022017973}, {"strategy": "TOP_UA_773_LC_10_LC", "symbol": "LC", "cluster": "Grains", "corr_lt": 0.03, "corr_ct": 0.023, "delta": -0.007, "max_abs": 0.03012479247389433}, {"strategy": "SOM_UA_2403_W_NG", "symbol": "NG", "cluster": "Energy", "corr_lt": -0.031, "corr_ct": null, "delta": null, "max_abs": 0.03056463194081863}, {"strategy": "SOM_UA_2306_Y_3_CL", "symbol": "CL", "cluster": "Energy", "corr_lt": -0.034, "corr_ct": -0.004, "delta": 0.029, "max_abs": 0.033609796579088934}, {"strategy": "TOP_UA_506_GC_30_GC", "symbol": "GC", "cluster": "Metals", "corr_lt": 0.004, "corr_ct": -0.036, "delta": -0.04, "max_abs": 0.03572416100552279}];
+        const clusterDist = {"Equity Indices US": {"count": 91, "high_corr": 18, "avg_corr": 0.44}, "Bonds": {"count": 5, "high_corr": 1, "avg_corr": 0.257}, "Metals": {"count": 57, "high_corr": 1, "avg_corr": 0.195}, "Energy": {"count": 39, "high_corr": 0, "avg_corr": 0.157}, "Equity Indices EU": {"count": 33, "high_corr": 0, "avg_corr": 0.249}, "Grains": {"count": 9, "high_corr": 0, "avg_corr": 0.173}, "Volatility": {"count": 1, "high_corr": 0, "avg_corr": 0.374}, "Currencies": {"count": 5, "high_corr": 0, "avg_corr": 0.095}, "Meats": {"count": 3, "high_corr": 0, "avg_corr": 0.151}};
+        const alerts = [{"type": "warning", "message": "Corrélation critique (≥0.6) avec 15 stratégie(s): TOP_UA_152_NQ_5_NQ, SOM_UA_2406_G_1_NQ, SOM_UA_2407_G_4_ES"}, {"type": "alert", "message": "Corrélation en hausse significative (+0.4) avec 3 stratégie(s)"}, {"type": "info", "message": "Décorrélation significative (-0.4) avec 4 stratégie(s)"}, {"type": "danger", "message": "Score Davey élevé (14.0): cette stratégie présente une forte redondance avec 28 autres stratégies. Considérer l'élimination."}];
+        const distribution = {"very_negative": 0, "negative": 12, "neutral": 292, "positive": 122, "very_positive": 12};
+        const config = {"threshold": 0.6, "critical": 0.6, "delta_significant": 0.4, "start_year": 2012, "recent_months": 12};
+        
+        // Populate alerts
+        const alertsContainer = document.getElementById('alertsContainer');
+        alerts.forEach(a => {
+            const icons = {
+                'success': '✅',
+                'info': 'ℹ️',
+                'warning': '⚠️',
+                'danger': '🚨',
+                'alert': '⚡'
+            };
+            alertsContainer.innerHTML += `
+                <div class="alert ${a.type}">
+                    <span class="alert-icon">${icons[a.type] || '📌'}</span>
+                    <span>${a.message}</span>
+                </div>
+            `;
+        });
+        
+        // Distribution bar
+        const total = Object.values(distribution).reduce((a, b) => a + b, 0);
+        if (total > 0) {
+            const distContainer = document.getElementById('distributionContainer');
+            const pcts = {
+                very_neg: (distribution.very_negative / total * 100).toFixed(1),
+                neg: (distribution.negative / total * 100).toFixed(1),
+                neutral: (distribution.neutral / total * 100).toFixed(1),
+                pos: (distribution.positive / total * 100).toFixed(1),
+                very_pos: (distribution.very_positive / total * 100).toFixed(1)
+            };
+            distContainer.innerHTML = `
+                <div class="distribution-bar">
+                    <div class="dist-segment very-neg" style="width:${pcts.very_neg}%">${distribution.very_negative}</div>
+                    <div class="dist-segment neg" style="width:${pcts.neg}%">${distribution.negative}</div>
+                    <div class="dist-segment neutral" style="width:${pcts.neutral}%">${distribution.neutral}</div>
+                    <div class="dist-segment pos" style="width:${pcts.pos}%">${distribution.positive}</div>
+                    <div class="dist-segment very-pos" style="width:${pcts.very_pos}%">${distribution.very_positive}</div>
+                </div>
+                <div class="distribution-legend">
+                    <span>🔵 r ≤ -0.7 (${distribution.very_negative})</span>
+                    <span>🔷 -0.7 < r ≤ -0.3 (${distribution.negative})</span>
+                    <span>⚪ -0.3 < r < 0.3 (${distribution.neutral})</span>
+                    <span>🟠 0.3 ≤ r < 0.7 (${distribution.positive})</span>
+                    <span>🔴 r ≥ 0.7 (${distribution.very_positive})</span>
+                </div>
+            `;
+        }
+        
+        // Cluster grid
+        const clusterGrid = document.getElementById('clusterGrid');
+        Object.keys(clusterDist).sort((a, b) => clusterDist[b].high_corr - clusterDist[a].high_corr).forEach(cl => {
+            const d = clusterDist[cl];
+            const pct = d.count > 0 ? (d.high_corr / d.count * 100) : 0;
+            const barColor = pct > 50 ? '#e74c3c' : pct > 25 ? '#f39c12' : '#27ae60';
+            clusterGrid.innerHTML += `
+                <div class="cluster-card">
+                    <div class="cluster-name">${cl}</div>
+                    <div class="cluster-stats">
+                        ${d.count} stratégies • ${d.high_corr} corrélées<br>
+                        Corr. moy: ${d.avg_corr.toFixed(3)}
+                    </div>
+                    <div class="cluster-bar">
+                        <div class="cluster-bar-fill" style="width:${pct}%;background:${barColor}"></div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        // Helper functions
+        function getCorrClass(val) {
+            if (val === null) return '';
+            const abs = Math.abs(val);
+            if (abs >= 0.7) return 'corr-high';
+            if (abs >= 0.5) return 'corr-medium';
+            if (val < -0.3) return 'corr-negative';
+            return 'corr-low';
+        }
+        
+        function formatCorr(val) {
+            return val !== null ? val.toFixed(3) : '-';
+        }
+        
+        function formatDelta(val) {
+            if (val === null) return '-';
+            const cls = val > 0.05 ? 'delta-positive' : val < -0.05 ? 'delta-negative' : '';
+            return `<span class="${cls}">${val >= 0 ? '+' : ''}${val.toFixed(3)}</span>`;
+        }
+        
+        function getTrend(delta) {
+            if (delta === null) return '<span class="trend-stable">→</span>';
+            if (delta > 0.1) return '<span class="trend-up">⬆️ Hausse</span>';
+            if (delta < -0.1) return '<span class="trend-down">⬇️ Baisse</span>';
+            return '<span class="trend-stable">→ Stable</span>';
+        }
+        
+        function getPotential(maxAbs) {
+            if (maxAbs < 0.2) return '⭐⭐⭐';
+            if (maxAbs < 0.4) return '⭐⭐';
+            return '⭐';
+        }
+        
+        // Populate most correlated table
+        const mostTable = document.querySelector('#mostCorrTable tbody');
+        mostCorrData.forEach((row, idx) => {
+            mostTable.innerHTML += `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td><a href="${row.strategy}_correlation.html" class="strategy-link">${row.strategy}</a></td>
+                    <td>${row.symbol}</td>
+                    <td><span class="cluster-badge">${row.cluster}</span></td>
+                    <td class="${getCorrClass(row.corr_lt)}">${formatCorr(row.corr_lt)}</td>
+                    <td class="${getCorrClass(row.corr_ct)}">${formatCorr(row.corr_ct)}</td>
+                    <td>${formatDelta(row.delta)}</td>
+                    <td>${getTrend(row.delta)}</td>
+                </tr>
+            `;
+        });
+        
+        // Populate least correlated table
+        const leastTable = document.querySelector('#leastCorrTable tbody');
+        leastCorrData.forEach((row, idx) => {
+            leastTable.innerHTML += `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td><a href="${row.strategy}_correlation.html" class="strategy-link">${row.strategy}</a></td>
+                    <td>${row.symbol}</td>
+                    <td><span class="cluster-badge">${row.cluster}</span></td>
+                    <td class="${getCorrClass(row.corr_lt)}">${formatCorr(row.corr_lt)}</td>
+                    <td class="${getCorrClass(row.corr_ct)}">${formatCorr(row.corr_ct)}</td>
+                    <td>${formatDelta(row.delta)}</td>
+                    <td>${getPotential(row.max_abs)}</td>
+                </tr>
+            `;
+        });
+    </script>
+</body>
+</html>

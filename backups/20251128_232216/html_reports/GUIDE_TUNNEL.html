@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide - Accès distant aux rapports Trading</title>
+
+<style id="theme-system">
+/* ============================================
+   DUAL THEME SYSTEM - Dark & Light Mode
+   ============================================ */
+
+:root {
+    /* Dark Theme (default) */
+    --bg-primary: #0f0f1a;
+    --bg-secondary: #1a1a2e;
+    --bg-card: #16213e;
+    --bg-hover: #1f3a5f;
+    --bg-input: #1a1a2e;
+    --text-primary: #eaeaea;
+    --text-secondary: #a0a0a0;
+    --text-muted: #6b7280;
+    --border-color: rgba(255,255,255,0.1);
+    --border-accent: rgba(78, 205, 196, 0.3);
+    --shadow-color: rgba(0,0,0,0.3);
+    --accent-green: #00d4aa;
+    --accent-red: #ff6b6b;
+    --accent-blue: #4ecdc4;
+    --accent-yellow: #ffe66d;
+    --accent-orange: #ffa502;
+    --accent-purple: #a855f7;
+    --code-bg: #0d1117;
+    --code-text: #c9d1d9;
+    --gradient-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    --gradient-accent: linear-gradient(135deg, rgba(78, 205, 196, 0.2) 0%, rgba(78, 205, 196, 0.05) 100%);
+}
+
+[data-theme="light"] {
+    /* Light Theme */
+    --bg-primary: #f0f2f5;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --bg-hover: #f8f9fa;
+    --bg-input: #ffffff;
+    --text-primary: #1a1a2e;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --border-color: rgba(0,0,0,0.1);
+    --border-accent: rgba(59, 130, 246, 0.3);
+    --shadow-color: rgba(0,0,0,0.1);
+    --accent-green: #10b981;
+    --accent-red: #ef4444;
+    --accent-blue: #3b82f6;
+    --accent-yellow: #f59e0b;
+    --accent-orange: #f97316;
+    --accent-purple: #8b5cf6;
+    --code-bg: #f6f8fa;
+    --code-text: #24292f;
+    --gradient-primary: linear-gradient(135deg, #ffffff 0%, #f0f2f5 100%);
+    --gradient-accent: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.02) 100%);
+}
+
+/* Smooth transition for theme change */
+*, *::before, *::after {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.2s ease, box-shadow 0.3s ease;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: var(--accent-green);
+}
+
+/* ============================================
+   NAVIGATION WITH THEME TOGGLE
+   ============================================ */
+
+.site-nav-tabs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--gradient-primary);
+    z-index: 9999;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    height: 50px;
+    box-shadow: 0 2px 10px var(--shadow-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.site-nav-tabs .nav-logo {
+    color: var(--accent-blue);
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-right: 30px;
+    white-space: nowrap;
+}
+
+.site-nav-tabs .nav-tab {
+    padding: 12px 25px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.site-nav-tabs .nav-tab:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+}
+
+.site-nav-tabs .nav-tab.active {
+    color: var(--accent-blue);
+    border-bottom-color: var(--accent-blue);
+    background: var(--gradient-accent);
+}
+
+.site-nav-tabs .nav-tab.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.site-nav-tabs .nav-spacer {
+    flex: 1;
+}
+
+.site-nav-tabs .nav-back {
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    background: var(--bg-hover);
+    transition: all 0.3s;
+    font-size: 0.9em;
+    white-space: nowrap;
+    margin-right: 15px;
+}
+
+.site-nav-tabs .nav-back:hover {
+    background: var(--gradient-accent);
+    color: var(--accent-blue);
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 25px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.3s;
+    color: var(--text-secondary);
+    font-size: 0.9em;
+}
+
+.theme-toggle:hover {
+    background: var(--gradient-accent);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+}
+
+.theme-toggle .theme-icon {
+    font-size: 1.1em;
+    transition: transform 0.3s;
+}
+
+.theme-toggle:hover .theme-icon {
+    transform: rotate(20deg);
+}
+
+.theme-toggle .theme-label {
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .theme-toggle .theme-label {
+        display: none;
+    }
+    .site-nav-tabs .nav-tab {
+        padding: 12px 15px;
+        font-size: 0.85em;
+    }
+}
+
+/* Adjust body padding for fixed nav */
+body.has-nav-tabs {
+    padding-top: 70px !important;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+
+.header {
+    background: var(--gradient-primary);
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px var(--shadow-color);
+    border: 1px solid var(--border-accent);
+}
+
+h1 {
+    color: var(--accent-blue);
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1em;
+    margin-bottom: 20px;
+}
+
+/* ============================================
+   STATS BOXES
+   ============================================ */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin: 30px 0;
+}
+
+.stat-box {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    padding: 20px 15px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 0.95em;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px var(--shadow-color);
+}
+
+.stat-box.performance {
+    background: var(--gradient-accent);
+    border-color: var(--accent-green);
+}
+
+.stat-box strong {
+    display: block;
+    font-size: 2em;
+    margin-bottom: 5px;
+    font-weight: 700;
+    color: var(--accent-blue);
+}
+
+.stat-box.performance strong {
+    color: var(--accent-green);
+}
+
+.stat-box .stat-label {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+}
+
+/* Stats Grid (MC style) */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px var(--shadow-color);
+}
+
+.stat-value {
+    font-size: 2.2em;
+    font-weight: bold;
+    color: var(--accent-blue);
+}
+
+.stat-value.ok { color: var(--accent-green); }
+.stat-value.warning { color: var(--accent-yellow); }
+.stat-value.danger { color: var(--accent-red); }
+
+.stat-label {
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    margin-top: 5px;
+}
+
+/* ============================================
+   FILTERS
+   ============================================ */
+
+.filters {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px var(--shadow-color);
+    border: 1px solid var(--border-color);
+}
+
+.search-box {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1em;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+}
+
+.search-box:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+}
+
+.search-box::placeholder {
+    color: var(--text-muted);
+}
+
+.filter-label {
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: block;
+    color: var(--text-primary);
+}
+
+.type-filter button {
+    padding: 8px 16px;
+    border: 2px solid var(--accent-blue);
+    background: transparent;
+    color: var(--accent-blue);
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.type-filter button:hover,
+.type-filter button.active {
+    background: var(--accent-blue);
+    color: var(--bg-primary);
+}
+
+.value-filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.value-filter {
+    background: var(--bg-secondary);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.value-filter label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+    font-size: 0.9em;
+}
+
+.range-inputs input {
+    width: 80px;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+}
+
+.range-inputs input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.filter-btn.apply {
+    background: var(--accent-green);
+    color: white;
+}
+
+.filter-btn.apply:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+
+.filter-btn.reset {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.sort-select {
+    padding: 8px 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 5px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+
+.sidebar {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 20px var(--shadow-color);
+    height: fit-content;
+    position: sticky;
+    top: 70px;
+    border: 1px solid var(--border-color);
+}
+
+.sidebar h2 {
+    color: var(--accent-blue);
+    font-size: 1.3em;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--accent-blue);
+    padding-bottom: 10px;
+}
+
+.sidebar h3 {
+    color: var(--text-primary);
+    font-size: 1em;
+    margin: 20px 0 10px 0;
+}
+
+.type-name {
+    color: var(--text-secondary);
+}
+
+.type-bar {
+    background: var(--bg-secondary);
+}
+
+.type-count {
+    color: var(--text-primary);
+}
+
+.top-list li {
+    color: var(--text-secondary);
+}
+
+.top-list a {
+    color: var(--accent-blue);
+}
+
+/* ============================================
+   STRATEGY CARDS
+   ============================================ */
+
+.strategies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 25px;
+}
+
+.strategy-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 20px var(--shadow-color);
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid var(--border-color);
+}
+
+.strategy-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px var(--shadow-color);
+    border-color: var(--border-accent);
+}
+
+.strategy-card h3 {
+    color: var(--text-primary);
+}
+
+.strategy-card h3 a {
+    color: var(--text-primary);
+}
+
+.strategy-card h3 a:hover {
+    color: var(--accent-blue);
+}
+
+.subtype-badge {
+    background: var(--bg-secondary) !important;
+    color: var(--text-secondary) !important;
+    border: 1px solid var(--border-color);
+}
+
+.kpi-mini {
+    background: var(--bg-secondary);
+}
+
+.kpi-mini-value {
+    color: var(--accent-blue);
+}
+
+.kpi-mini-label {
+    color: var(--text-secondary);
+}
+
+.card-metrics {
+    border-top: 1px solid var(--border-color);
+}
+
+.metric-label {
+    color: var(--text-secondary);
+}
+
+.metric-value {
+    color: var(--text-primary);
+}
+
+.metric-value.positive {
+    color: var(--accent-green);
+}
+
+.metric-value.negative {
+    color: var(--accent-red);
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    text-align: right;
+    border-bottom: 1px solid var(--border-color);
+}
+
+th {
+    background: var(--bg-secondary);
+    color: var(--accent-blue);
+    font-weight: 600;
+}
+
+th:first-child, td:first-child {
+    text-align: left;
+}
+
+tr:hover {
+    background: var(--bg-hover);
+}
+
+tr.recommended {
+    background: var(--gradient-accent);
+}
+
+/* ============================================
+   CHARTS
+   ============================================ */
+
+.chart-card, .chart-container {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.chart-card h3 {
+    color: var(--accent-blue);
+    margin-bottom: 15px;
+}
+
+/* ============================================
+   KPI DASHBOARD (Strategy Pages)
+   ============================================ */
+
+.kpi-dashboard {
+    background: var(--gradient-primary);
+    border-radius: 12px;
+    padding: 25px;
+    margin: 25px 0;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    border: 1px solid var(--border-accent);
+}
+
+.kpi-chip {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+}
+
+.chip-label {
+    color: var(--text-secondary);
+}
+
+.chip-value {
+    color: var(--text-primary);
+}
+
+.kpi-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+}
+
+.kpi-card:hover {
+    border-color: var(--border-accent);
+}
+
+.kpi-title {
+    color: var(--text-secondary);
+}
+
+.kpi-value {
+    color: var(--text-primary);
+}
+
+.kpi-subtitle {
+    color: var(--text-muted);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+
+.code-block {
+    background-color: var(--code-bg);
+    color: var(--code-text);
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    border: 1px solid var(--border-color);
+}
+
+/* ============================================
+   MISC
+   ============================================ */
+
+.section {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 25px 0;
+}
+
+.info-box {
+    background: var(--bg-secondary);
+    border-left: 4px solid var(--accent-blue);
+}
+
+.info-box strong {
+    color: var(--text-primary);
+}
+
+.recommendation {
+    background: var(--bg-secondary);
+    border-radius: 0 8px 8px 0;
+}
+
+.recommendation h3.ok { color: var(--accent-green); }
+.recommendation h3.warning { color: var(--accent-yellow); }
+.recommendation h3.danger { color: var(--accent-red); }
+
+.criteria-list li::before {
+    color: var(--accent-green);
+}
+
+.criteria-list li.fail::before {
+    color: var(--accent-red);
+}
+
+footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px;
+    color: var(--text-secondary);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bg-card);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--bg-hover);
+}
+
+/* ============================================
+   BACK LINK (for strategy pages)
+   ============================================ */
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.back-link:hover {
+    color: var(--accent-green);
+}
+
+/* Container for strategy pages */
+body > .container {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 20px var(--shadow-color);
+    border: 1px solid var(--border-color);
+}
+
+h2 {
+    color: var(--text-primary);
+    border-left: 4px solid var(--accent-blue);
+    padding-left: 15px;
+}
+
+.score {
+    color: var(--accent-green);
+}
+
+.score.low {
+    color: var(--accent-red);
+}
+
+.score.medium {
+    color: var(--accent-yellow);
+}
+</style>
+
+<script id="theme-toggle-script">
+(function() {
+    // Initialiser le thème au chargement
+    function initTheme() {
+        const savedTheme = localStorage.getItem('trading-theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        } else if (!prefersDark) {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+        // Par défaut: dark theme (pas besoin d'attribut)
+        
+        updateToggleButton();
+    }
+    
+    // Basculer le thème
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        if (newTheme === 'dark') {
+            document.documentElement.removeAttribute('data-theme');
+        } else {
+            document.documentElement.setAttribute('data-theme', newTheme);
+        }
+        
+        localStorage.setItem('trading-theme', newTheme);
+        updateToggleButton();
+    }
+    
+    // Mettre à jour l'icône et le texte du bouton
+    function updateToggleButton() {
+        const btn = document.querySelector('.theme-toggle');
+        if (!btn) return;
+        
+        const isDark = !document.documentElement.getAttribute('data-theme') || 
+                       document.documentElement.getAttribute('data-theme') === 'dark';
+        
+        const icon = btn.querySelector('.theme-icon');
+        const label = btn.querySelector('.theme-label');
+        
+        if (isDark) {
+            icon.textContent = '🌙';
+            label.textContent = 'Dark';
+        } else {
+            icon.textContent = '☀️';
+            label.textContent = 'Light';
+        }
+    }
+    
+    // Exposer la fonction toggle globalement
+    window.toggleTheme = toggleTheme;
+    
+    // Initialiser au chargement du DOM
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initTheme);
+    } else {
+        initTheme();
+    }
+    
+    // Écouter les changements de préférence système
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('trading-theme')) {
+            if (e.matches) {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+            updateToggleButton();
+        }
+    });
+})();
+</script>
+
+    <style>
+        :root {
+            --primary: #f6821f;
+            --primary-dark: #d97218;
+            --bg-dark: #1a1a2e;
+            --bg-card: #16213e;
+            --bg-code: #0f0f23;
+            --text: #eaeaea;
+            --text-muted: #a0a0a0;
+            --success: #00d26a;
+            --warning: #ffc107;
+            --danger: #ff6b6b;
+            --border: #2a2a4a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-dark));
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+        
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--primary), #ff9f43);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        header p {
+            color: var(--text-muted);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+        
+        .badge-success { background: var(--success); color: #000; }
+        .badge-warning { background: var(--warning); color: #000; }
+        
+        .toc {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+        
+        .toc h2 {
+            font-size: 1rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .toc ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+        
+        .toc a {
+            color: var(--text);
+            text-decoration: none;
+            padding: 0.5rem;
+            border-radius: 6px;
+            display: block;
+            transition: all 0.2s;
+        }
+        
+        .toc a:hover {
+            background: var(--bg-dark);
+            color: var(--primary);
+        }
+        
+        section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+        
+        section h2 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        section h3 {
+            color: var(--text);
+            font-size: 1.1rem;
+            margin: 1.5rem 0 0.75rem 0;
+        }
+        
+        .step {
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        
+        code {
+            background: var(--bg-code);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #7dd3fc;
+        }
+        
+        pre {
+            background: var(--bg-code);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid var(--border);
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+            color: #a5f3fc;
+        }
+        
+        .command-box {
+            background: linear-gradient(135deg, #1e3a5f, #0f2744);
+            border: 1px solid #2d5a87;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .command-box .label {
+            color: var(--primary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .url-box {
+            background: linear-gradient(135deg, #1a4a3a, #0f2e24);
+            border: 1px solid #2d8a6a;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        
+        .url-box code {
+            font-size: 1rem;
+            color: #6ee7b7;
+            background: rgba(0,0,0,0.3);
+            padding: 0.5rem 1rem;
+            display: inline-block;
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, #4a3a1a, #2e240f);
+            border: 1px solid #8a6a2d;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .warning-box::before {
+            content: "⚠️ ";
+        }
+        
+        .success-box {
+            background: linear-gradient(135deg, #1a4a2a, #0f2e1a);
+            border: 1px solid #2d8a4a;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .success-box::before {
+            content: "✅ ";
+        }
+        
+        .architecture {
+            background: var(--bg-code);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 1rem 0;
+            font-family: 'Cascadia Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+        
+        .faq-item {
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin: 0.75rem 0;
+        }
+        
+        .faq-item strong {
+            color: var(--primary);
+        }
+        
+        .quick-ref {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .quick-ref-card {
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+        
+        .quick-ref-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 600px) {
+            body { padding: 1rem; }
+            section { padding: 1.5rem; }
+            header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body class="has-nav-tabs">
+
+<div class="site-nav-tabs">
+    <span class="nav-logo">📊 Strategy Details</span>
+    <a href="GUIDE_TUNNEL.html" class="nav-tab active">📋 Analyse AI</a>
+    <a href="#" class="nav-tab disabled">🎲 Monte Carlo</a>
+    <div class="nav-spacer"></div>
+    <a href="index.html" class="nav-back">← Dashboard</a>
+    
+<button class="theme-toggle" onclick="toggleTheme()" title="Changer de thème">
+    <span class="theme-icon">🌙</span>
+    <span class="theme-label">Dark</span>
+</button>
+
+</div>
+
+<a href="index.html" class="nav-back">← Dashboard</a>
+</div>
+
+    <div class="container">
+        <header>
+            <h1>🔒 Accès distant aux rapports Trading</h1>
+
+            <div class="kpi-dashboard">
+                <h2>📈 Performance Dashboard</h2>
+                <div class="no-data">
+                    <p>⚠️ N/A - No performance data available for this strategy in Portfolio Report.</p>
+                </div>
+            </div>
+            
+
+            <div class="equity-section">
+                <h2>📈 Equity Curve</h2>
+                <div class="no-data">
+                    <p>⚠️ N/A - Equity curve data not available (no matching DataSource file).</p>
+                </div>
+            </div>
+            
+            <p>Guide utilisateur - Cloudflare Tunnel</p>
+            <div style="margin-top: 1rem;">
+                <span class="badge badge-success">Aucun port ouvert</span>
+                <span class="badge badge-success">HTTPS automatique</span>
+                <span class="badge badge-warning">Gratuit</span>
+            </div>
+        </header>
+
+        <nav class="toc">
+            <h2>📋 Table des matières</h2>
+            <ul>
+                <li><a href="#presentation">1. Présentation</a></li>
+                <li><a href="#securite">2. Architecture de sécurité</a></li>
+                <li><a href="#installation">3. Installation</a></li>
+                <li><a href="#utilisation">4. Utilisation quotidienne</a></li>
+                <li><a href="#arret">5. Arrêt du serveur</a></li>
+                <li><a href="#depannage">6. Dépannage</a></li>
+                <li><a href="#faq">7. FAQ</a></li>
+                <li><a href="#aide-memoire">8. Aide-mémoire</a></li>
+            </ul>
+        </nav>
+
+        <section id="presentation">
+            <h2>1. Présentation</h2>
+            <p>Ce système permet d'accéder aux rapports HTML de stratégies trading depuis n'importe quel appareil (PC, téléphone, tablette) via une URL sécurisée HTTPS, <strong>sans compromettre la sécurité du serveur de trading</strong>.</p>
+            
+            <div class="success-box">
+                <strong>Avantages clés :</strong> Aucun port ouvert sur le serveur • Connexion chiffrée HTTPS automatique • Fonctionne derrière un pare-feu/NAT • Service gratuit Cloudflare
+            </div>
+        </section>
+
+        <section id="securite">
+            <h2>2. Architecture de sécurité</h2>
+            
+            <div class="architecture">
+                           CONNEXION SORTANTE UNIQUEMENT<br><br>
+┌──────────────┐         ┌──────────────┐         ┌──────────────┐<br>
+│   SERVEUR    │ ──────► │  CLOUDFLARE  │ ◄────── │  NAVIGATEUR  │<br>
+│   TRADING    │  QUIC   │   (CDN)      │  HTTPS  │  (externe)   │<br>
+└──────────────┘         └──────────────┘         └──────────────┘<br>
+      │                         │                        │<br>
+ Port 8080                 Tunnel                   URL publique<br>
+ (local only)              sécurisé            xxx.trycloudflare.com
+            </div>
+            
+            <div class="warning-box">
+                <strong>Important :</strong> Le serveur n'ouvre AUCUN port entrant. Seuls les fichiers du dossier <code>html_reports</code> sont exposés. L'URL change à chaque démarrage (sécurité supplémentaire).
+            </div>
+        </section>
+
+        <section id="installation">
+            <h2>3. Installation (première fois uniquement)</h2>
+            
+            <h3>3.1 Télécharger cloudflared</h3>
+            <div class="step">
+                <span class="step-number">1</span>
+                Ouvrir ce lien dans un navigateur :<br>
+                <a href="https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.msi" style="color: var(--primary);">
+                    https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.msi
+                </a>
+            </div>
+            <div class="step">
+                <span class="step-number">2</span>
+                Exécuter le fichier <code>.msi</code> téléchargé
+            </div>
+            <div class="step">
+                <span class="step-number">3</span>
+                Suivre l'assistant : Next → Next → Install → Finish
+            </div>
+
+            <h3>3.2 Vérifier l'installation</h3>
+            <div class="step">
+                <span class="step-number">1</span>
+                Ouvrir PowerShell (touche Windows → taper "powershell" → Entrée)
+            </div>
+            <div class="step">
+                <span class="step-number">2</span>
+                Taper la commande :
+                <pre><code>cloudflared --version</code></pre>
+            </div>
+            <div class="step">
+                <span class="step-number">3</span>
+                Résultat attendu : <code>cloudflared version 2025.x.x (...)</code>
+            </div>
+            
+            <div class="warning-box">
+                Si "commande non reconnue" : fermer et rouvrir PowerShell
+            </div>
+        </section>
+
+        <section id="utilisation">
+            <h2>4. Utilisation quotidienne</h2>
+            
+            <h3>Méthode rapide (recommandée)</h3>
+            
+            <div class="command-box">
+                <div class="label">Commandes à exécuter dans PowerShell</div>
+                <pre><code>cd C:\TradeData\mc_ai_analysis
+.\serve_reports.ps1</code></pre>
+            </div>
+            
+            <p>Après quelques secondes, le tunnel affiche l'URL :</p>
+            
+            <div class="url-box">
+                <code>https://xxxxx-xxxxx-xxxxx-xxxxx.trycloudflare.com</code>
+            </div>
+            
+            <h3>Accès aux rapports</h3>
+            <p>Une fois l'URL obtenue :</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>Index principal :</strong> <code>https://[URL]/index.html</code></li>
+                <li><strong>Rapport spécifique :</strong> <code>https://[URL]/TOP_UA_287_GC_5.html</code></li>
+            </ul>
+            
+            <h3>Méthode manuelle (si le script ne fonctionne pas)</h3>
+            <p>Ouvrir <strong>deux fenêtres</strong> PowerShell :</p>
+            
+            <div class="command-box">
+                <div class="label">Fenêtre 1 - Serveur local</div>
+                <pre><code>cd C:\TradeData\mc_ai_analysis\html_reports
+python -m http.server 8080</code></pre>
+            </div>
+            
+            <div class="command-box">
+                <div class="label">Fenêtre 2 - Tunnel Cloudflare</div>
+                <pre><code>cloudflared tunnel --url http://localhost:8080</code></pre>
+            </div>
+        </section>
+
+        <section id="arret">
+            <h2>5. Arrêt du serveur</h2>
+            <p>Pour arrêter le serveur et fermer le tunnel :</p>
+            <div class="command-box">
+                <div class="label">Raccourci clavier</div>
+                <pre><code>CTRL+C</code></pre>
+            </div>
+            <p>Le tunnel se ferme immédiatement et l'URL devient inaccessible.</p>
+        </section>
+
+        <section id="depannage">
+            <h2>6. Dépannage</h2>
+            
+            <div class="faq-item">
+                <strong>❌ "cloudflared n'est pas reconnu"</strong><br>
+                <em>Solution 1 :</em> Fermer et rouvrir PowerShell<br>
+                <em>Solution 2 :</em> Utiliser le chemin complet :
+                <pre><code>"C:\Program Files (x86)\cloudflared\cloudflared.exe" tunnel --url http://localhost:8080</code></pre>
+            </div>
+            
+            <div class="faq-item">
+                <strong>❌ "Le port 8080 est déjà utilisé"</strong><br>
+                <pre><code>netstat -ano | findstr :8080
+taskkill /PID [NUMERO] /F</code></pre>
+            </div>
+            
+            <div class="faq-item">
+                <strong>❌ "Execution of scripts is disabled"</strong><br>
+                Exécuter en PowerShell Admin :
+                <pre><code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser</code></pre>
+            </div>
+            
+            <div class="faq-item">
+                <strong>❌ Page blanche ou erreur 502</strong><br>
+                • Vérifier que le serveur Python tourne (fenêtre 1)<br>
+                • Tester localement : <code>http://localhost:8080/index.html</code><br>
+                • Relancer le tunnel si nécessaire
+            </div>
+        </section>
+
+        <section id="faq">
+            <h2>7. FAQ</h2>
+            
+            <div class="faq-item">
+                <strong>Q: L'URL est-elle permanente ?</strong><br>
+                R: Non, elle change à chaque démarrage. C'est une mesure de sécurité. Pour une URL fixe, il faut un domaine Cloudflare.
+            </div>
+            
+            <div class="faq-item">
+                <strong>Q: Quelqu'un peut-il accéder à mes rapports ?</strong><br>
+                R: Seules les personnes ayant l'URL exacte peuvent y accéder. Ne partagez pas l'URL publiquement.
+            </div>
+            
+            <div class="faq-item">
+                <strong>Q: Mes données de trading sont-elles exposées ?</strong><br>
+                R: Non, seul le contenu du dossier <code>html_reports</code> est accessible. Les fichiers de stratégies et configurations restent isolés.
+            </div>
+            
+            <div class="faq-item">
+                <strong>Q: Le serveur de trading est-il vulnérable ?</strong><br>
+                R: Non. Aucun port n'est ouvert. La connexion est SORTANTE uniquement.
+            </div>
+            
+            <div class="faq-item">
+                <strong>Q: Puis-je accéder aux rapports depuis mon téléphone ?</strong><br>
+                R: Oui, l'URL fonctionne sur tout appareil avec un navigateur web.
+            </div>
+        </section>
+
+        <section id="aide-memoire">
+            <h2>8. Aide-mémoire</h2>
+            
+            <div class="quick-ref">
+                <div class="quick-ref-card">
+                    <h4>▶️ Démarrer</h4>
+                    <pre><code>cd C:\TradeData\mc_ai_analysis
+.\serve_reports.ps1</code></pre>
+                </div>
+                
+                <div class="quick-ref-card">
+                    <h4>⏹️ Arrêter</h4>
+                    <pre><code>CTRL+C</code></pre>
+                </div>
+                
+                <div class="quick-ref-card">
+                    <h4>🔍 Vérifier version</h4>
+                    <pre><code>cloudflared --version</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>Guide créé le 26 novembre 2025 • Compatible Windows 10/11</p>
+            <p>Fichiers : <code>C:\TradeData\mc_ai_analysis\</code></p>
+        </footer>
+    </div>
+</body>
+</html>
