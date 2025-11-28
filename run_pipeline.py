@@ -15,7 +15,7 @@ Usage:
     python run_pipeline.py --dry-run          # Affiche ce qui serait fait
     python run_pipeline.py --skip-preprocessing  # Sauter mapping + harmonization
 
-Version: 2.1.0
+Version: 2.1.1
 Date: 2025-11-28
 """
 
@@ -187,7 +187,6 @@ def step_enrich_kpis(config: PipelineConfig) -> Dict[str, Any]:
     try:
         # Import du module
         from src.enrichers.kpi_enricher import KPIEnricher
-        from src.enrichers.equity_enricher import enrich_html_with_equity_curve
         from src.enrichers.styles import get_kpi_styles
         
         # Charger le Portfolio Report
