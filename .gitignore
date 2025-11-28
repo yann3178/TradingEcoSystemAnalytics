@@ -1,0 +1,87 @@
+# Trading Strategy Pipeline V2 - .gitignore
+
+# =============================================================================
+# DONNÉES SENSIBLES ET VOLUMINEUSES (NE PAS VERSIONNER)
+# =============================================================================
+
+# Credentials et secrets
+config/credentials.json
+*.pem
+*.key
+.env
+.env.*
+
+# Données brutes volumineuses
+data/mc_export/
+data/equity_curves/
+data/portfolio_reports/
+
+# Outputs générés (reconstruisibles)
+outputs/html_reports/
+outputs/monte_carlo/
+outputs/correlation/
+outputs/csv/
+outputs/consolidated/
+
+# Logs
+logs/
+*.log
+
+# =============================================================================
+# PYTHON
+# =============================================================================
+
+# Byte-compiled
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+ENV/
+
+# Distribution
+*.egg-info/
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# =============================================================================
+# WINDOWS
+# =============================================================================
+
+Thumbs.db
+Desktop.ini
+*.bak
+
+# =============================================================================
+# TESTS
+# =============================================================================
+
+# Données de test (versionnées séparément)
+tests/data/large/
+
+# Coverage reports
+.coverage
+htmlcov/
+coverage.xml
+
+# Pytest
+.pytest_cache/
+
+# =============================================================================
+# FICHIERS À INCLURE EXPLICITEMENT (override .gitignore)
+# =============================================================================
+
+# Échantillons de données pour les tests (petits fichiers)
+!tests/data/samples/
+!tests/data/expected/
