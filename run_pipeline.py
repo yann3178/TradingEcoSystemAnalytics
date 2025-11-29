@@ -18,7 +18,7 @@ Usage:
     python run_pipeline.py --dry-run          # Affiche ce qui serait fait
     python run_pipeline.py --skip-preprocessing  # Sauter mapping + harmonization
 
-Version: 2.2.0
+Version: 2.3.0
 Date: 2025-11-28
 """
 
