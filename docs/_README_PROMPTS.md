@@ -1,0 +1,1 @@
+Copie le contenu complet depuis le fichier créé dans la conversation précédente.

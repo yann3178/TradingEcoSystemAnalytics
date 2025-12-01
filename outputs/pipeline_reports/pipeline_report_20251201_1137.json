@@ -1,0 +1,36 @@
+{
+  "timestamp": "20251201_1137",
+  "dry_run": false,
+  "steps": {
+    "0a_mapping": {
+      "step": "strategy_mapping",
+      "success": false,
+      "nb_strategies": 0,
+      "nb_mappings": 0,
+      "errors": 1,
+      "duration_seconds": 0.0
+    },
+    "enrich": {
+      "step": "enrich_html_reports",
+      "success": true,
+      "enriched": 246,
+      "enriched_kpi": 245,
+      "enriched_equity": 6,
+      "enriched_both": 6,
+      "equity_preserved_with_warning": 0,
+      "missing_equity_data": 240,
+      "skipped": 583,
+      "errors": 0,
+      "duration_seconds": 12.5
+    },
+    "1b_harmonization": {
+      "step": "name_harmonization",
+      "success": false,
+      "renamed": 0,
+      "kept_original": 0,
+      "errors": 1,
+      "duration_seconds": 0
+    }
+  },
+  "total_duration_seconds": 12.6
+}

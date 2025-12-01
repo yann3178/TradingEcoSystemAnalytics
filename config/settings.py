@@ -48,8 +48,8 @@ HTML_INDEX_FILE = HTML_REPORTS_DIR / "index.html"
 
 # AI Analysis HTML Reports (V2 migration)
 AI_ANALYSIS_DIR = OUTPUT_ROOT / "ai_analysis"
-AI_HTML_REPORTS_DIR = AI_ANALYSIS_DIR / "html_reports"
-AI_INDEX_FILE = AI_HTML_REPORTS_DIR / "index.html"
+AI_HTML_REPORTS_DIR = HTML_REPORTS_DIR # AI_ANALYSIS_DIR / "html_reports"
+AI_INDEX_FILE = HTML_INDEX_FILE # AI_HTML_REPORTS_DIR / "index.html"
 
 # Exports CSV
 CSV_OUTPUT_DIR = OUTPUT_ROOT / "csv"
@@ -59,6 +59,8 @@ STRATEGY_SUMMARY_CSV = CSV_OUTPUT_DIR / "strategy_summary.csv"
 # Données consolidées
 CONSOLIDATED_DIR = OUTPUT_ROOT / "consolidated"
 CORRELATION_DIR = OUTPUT_ROOT / "correlation"
+HTML_CORRELATION_DIR = HTML_REPORTS_DIR / "correlation"
+HTML_MONTECARLO_DIR = HTML_REPORTS_DIR / "montecarlo"
 
 # =============================================================================
 # CHEMINS LOGS

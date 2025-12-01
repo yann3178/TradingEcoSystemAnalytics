@@ -37,13 +37,11 @@ sys.path.insert(0, str(V2_ROOT))
 
 # Imports projet
 from config.settings import (
-
     V2_ROOT, OUTPUT_ROOT, DATA_ROOT,
     PORTFOLIO_REPORTS_DIR, HTML_REPORTS_DIR, EQUITY_CURVES_DIR,
     CONSOLIDATED_DIR, CORRELATION_DIR, CSV_OUTPUT_DIR,
     FUZZY_MATCH_THRESHOLD, LEGACY_ROOT,
-    ensure_directories, get_latest_portfolio_report, get_latest_consolidated,
-    HTML_CORRELATION_DIR, HTML_MONTECARLO_DIR,
+    ensure_directories, get_latest_portfolio_report, get_latest_consolidated
 )
 
 
@@ -77,7 +75,7 @@ class PipelineConfig:
         self.enrich_include_equity = True  # Enrichir avec equity curves
         
         # Paramètres Monte Carlo
-        self.mc_nb_simulations = 2000
+        self.mc_nb_simulations = 1000
         self.mc_nb_capital_levels = 10
         self.mc_capital_minimum = 10000
         self.mc_capital_increment = 5000
@@ -949,17 +947,15 @@ def step_correlation(config: PipelineConfig) -> Dict[str, Any]:
             analyzer.print_summary()
         
         # Exporter les résultats
-        # CSV dans correlation/
         corr_output_dir = CORRELATION_DIR / config.timestamp
         corr_output_dir.mkdir(parents=True, exist_ok=True)
         
         exported_files = analyzer.export_csv(corr_output_dir, prefix="correlation")
         
-        # HTML Dashboard dans html_reports/correlation/dashboards/
+        # Générer le dashboard HTML si demandé
         if config.generate_dashboard:
             try:
-                HTML_CORRELATION_DASHBOARDS_DIR.mkdir(parents=True, exist_ok=True)
-                dashboard_path = HTML_CORRELATION_DASHBOARDS_DIR / f"correlation_dashboard_{config.timestamp}.html"
+                dashboard_path = corr_output_dir / f"correlation_dashboard_{config.timestamp}.html"
                 analyzer.export_dashboard(dashboard_path)
                 exported_files['dashboard'] = dashboard_path
                 result['dashboard_path'] = str(dashboard_path)

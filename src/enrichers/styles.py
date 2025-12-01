@@ -245,3 +245,13 @@ KPI_DASHBOARD_CSS = '''
     }
 </style>
 '''
+
+
+def get_kpi_styles() -> str:
+    """
+    Retourne les styles CSS pour le dashboard KPI.
+    
+    Returns:
+        str: Code HTML contenant les styles CSS
+    """
+    return KPI_DASHBOARD_CSS

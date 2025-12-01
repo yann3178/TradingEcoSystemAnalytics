@@ -1,22 +1,15 @@
 """
-Module Monte Carlo V2 pour l'analyse de stratégies de trading.
+Module Monte Carlo V2
+=====================
+
+Simulation Monte Carlo pour l'analyse de risque des stratégies de trading.
+Basé sur la méthodologie Kevin Davey.
+
+Modules:
+- simulator.py: Simulateur Monte Carlo principal
+- data_loader.py: Chargement des données de trades
+- config.py: Configuration des paramètres
+- monte_carlo_html_generator.py: Génération des rapports HTML
 """
 
-from .config import DEFAULT_CONFIG, STATUS_OK, STATUS_WARNING, STATUS_HIGH_RISK
-from .simulator import MonteCarloSimulator
-from .data_loader import (
-    load_trades_for_monte_carlo,
-    detect_file_format,
-    load_extracted_trades_file,
-)
-
-__all__ = [
-    'DEFAULT_CONFIG',
-    'STATUS_OK',
-    'STATUS_WARNING', 
-    'STATUS_HIGH_RISK',
-    'MonteCarloSimulator',
-    'load_trades_for_monte_carlo',
-    'detect_file_format',
-    'load_extracted_trades_file',
-]
+__version__ = "2.0.0"
